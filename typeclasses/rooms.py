@@ -42,13 +42,13 @@ class Room(ObjectParent, DefaultRoom):
 
             time_str = ""
             if days > 0:
-                time_str = f"{days}d "
+                time_str = f"{days}d"
                 return time_str.strip()
             elif hours > 0:
-                time_str = f"{hours}h "
+                time_str = f"{hours}h"
                 return time_str.strip()
             elif minutes > 0:
-                time_str = f"{minutes}m "
+                time_str = f"{minutes}m"
                 return time_str.strip()
             elif seconds > 0:
                 time_str += f"{seconds}s"
@@ -85,15 +85,15 @@ class Room(ObjectParent, DefaultRoom):
 
                     # show the idle time.  If the character is the looker, show 0s.
                     if char == looker:
-                        charstring += ANSIString("  |w0s|n").ljust(10)
+                        charstring += ANSIString("  |w0s|n").rjust(5)
                     else:
-                        charstring += ANSIString("  %s" %
-                                                 format_time(char.idle_time)).ljust(10)
+                        charstring += ANSIString("%s" %
+                                                 format_time(char.idle_time)).rjust(5)
 
                     # if the character has a short_description, show it. ekse show how to set it.
                     if char.db.short_description:
                         charstring += ANSIString("  %s" %
-                                                 char.db.short_description).ljust(50)
+                                                 char.db.short_description).ljust(55)
                     else:
                         charstring += ANSIString(
                             "  Use '+shortdesc <description>' to set this.|n")
