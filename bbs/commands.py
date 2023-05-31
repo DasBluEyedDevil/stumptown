@@ -141,7 +141,7 @@ class CmdBBS(default_cmds.MuxCommand):
         output += ANSIString("|wLast Post|n").ljust(24)
         output += ANSIString("|w# of Messages").ljust(15) + "\n"
         output += ANSIString("|b=|n"*78) + "\n"
-
+        datetime_obj = None
         for board in boards:
             if self.caller.check_permstring(board.read_perm):
                 last_post = board.posts.last()
