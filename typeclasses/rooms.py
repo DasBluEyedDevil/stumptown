@@ -36,17 +36,21 @@ class Room(ObjectParent, DefaultRoom):
             days, hours = divmod(hours, 24)
             # round seconds
             seconds = int(round(seconds, 0))
+            minutes = int(round(minutes, 0))
+            hours = int(round(hours, 0))
+            days = int(round(days, 0))
+
             time_str = ""
             if days > 0:
                 time_str = f"{days}d "
                 return time_str.strip()
-            if hours > 0:
+            elif hours > 0:
                 time_str = f"{hours}h "
                 return time_str.strip()
-            if minutes > 0:
+            elif minutes > 0:
                 time_str = f"{minutes}m "
                 return time_str.strip()
-            if seconds > 0:
+            elif seconds > 0:
                 time_str += f"{seconds}s"
                 return time_str.strip()
 
@@ -71,6 +75,7 @@ class Room(ObjectParent, DefaultRoom):
                 # if the looker can see the character, show the name, idle time and a short_desctiption
                 if char.access(looker, "view"):
                     # if the listed char is admin or greater, show a star '* ' before the name
+
                     if char.locks.check_lockstring(char, "perm(Admin)"):
                         charstring = ANSIString("|c*|n  %s|n" %
                                                 char.get_display_name(looker)).ljust(20)
@@ -78,9 +83,12 @@ class Room(ObjectParent, DefaultRoom):
                         charstring = ANSIString("   %s|n" %
                                                 char.get_display_name(looker)).ljust(20)
 
-                    # show the idle time
-                    charstring += ANSIString("|w%s|n" %
-                                             format_time(char.idle_time)).rjust(5)
+                    # show the idle time.  If the character is the looker, show 0s.
+                    if char == looker:
+                        charstring += ANSIString("  |w0s|n").ljust(10)
+                    else:
+                        charstring += ANSIString("  %s" %
+                                                 format_time(char.idle_time)).ljust(10)
 
                     # if the character has a short_description, show it. ekse show how to set it.
                     if char.db.short_description:
