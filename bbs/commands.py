@@ -150,7 +150,13 @@ class CmdBBS(default_cmds.MuxCommand):
                     datetime_obj = datetime.fromisoformat(
                         str(last_post.created_at))
 
-                formatted_datetime = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+                if datetime_obj:
+
+                    formatted_datetime = datetime_obj.strftime(
+                        "%Y-%m-%d %H:%M:%S")
+                else:
+                    formatted_datetime = "None"
+
                 last_post_date = formatted_datetime if last_post else "None"
                 num_posts = board.posts.count()
 
