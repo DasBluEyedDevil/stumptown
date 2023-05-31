@@ -18,6 +18,7 @@ from evennia import default_cmds
 from commands.chargen import cmdCg, cmdSplat, cmdSheet
 from evennia.contrib.game_systems import mail
 from jobs.jobCmdSet import JobCmdSet
+from bbs.CmdSet import CmdSet as CmdBBS
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -42,6 +43,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(cmdSheet)
         self.add(mail.CmdMail())
         self.add(JobCmdSet())
+        self.add(CmdBBS())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):

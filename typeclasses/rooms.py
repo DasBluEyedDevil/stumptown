@@ -38,15 +38,17 @@ class Room(ObjectParent, DefaultRoom):
             seconds = int(round(seconds, 0))
             time_str = ""
             if days > 0:
-                time_str += f"{days}d "
+                time_str = f"{days}d "
+                return time_str.strip()
             if hours > 0:
-                time_str += f"{hours}h "
+                time_str = f"{hours}h "
+                return time_str.strip()
             if minutes > 0:
-                time_str += f"{minutes}m "
+                time_str = f"{minutes}m "
+                return time_str.strip()
             if seconds > 0:
                 time_str += f"{seconds}s"
-
-            return time_str.strip()
+                return time_str.strip()
 
         # Get the description, build the string
         description = self.db.desc
@@ -69,7 +71,7 @@ class Room(ObjectParent, DefaultRoom):
                 # if the looker can see the character, show the name, idle time and a short_desctiption
                 if char.access(looker, "view"):
                     # if the listed char is admin or greater, show a star '* ' before the name
-                    if char.locks.check_lockstring(looker, "perm(Admin)"):
+                    if char.locks.check_lockstring(char, "perm(Admin)"):
                         charstring = ANSIString("|c*|n  %s|n" %
                                                 char.get_display_name(looker)).ljust(20)
                     else:
