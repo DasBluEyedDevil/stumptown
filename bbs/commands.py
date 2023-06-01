@@ -372,7 +372,7 @@ class CmdBBS(default_cmds.MuxCommand):
             output += ANSIString("|b-|n"*78) + "\n"
             for comment in comments:
                 com = ANSIString("|w{}. {} - {}|n".format(
-                    comment.id, comment.created_at.strftime("%Y-%m-%d %H:%M"), comment.author)) + " - "
+                    comment.id, comment.created_at.strftime("%Y-%m-%d %H:%M"), comment.author.name)) + ": "
                 com += ANSIString(comment.body) + "\n"
                 output += com[:78]
         else:
@@ -478,3 +478,43 @@ class CmdBBS(default_cmds.MuxCommand):
         # Code to add the player to a group
         # You would modify self.caller.db.groups here
         pass
+
+
+class classCmdBbRead(MuxCommand):
+    """
+    Read a board, or post from the bbs.  A shortcut for +bb.
+
+    Usage:
+      +bbread <board name or ID>
+      +bbread <board name or ID>/<post name or ID>
+
+    """
+
+    key = "+bbread"
+    aliases = ["bbread"]
+    locks = "cmd:all()"
+    help_category = "BBS"
+
+    def func(self):
+        "Implement the command."
+        comment = None
+        try:
+            board_name, post_name = self.args.split("/")
+        except ValueError:
+            board_name = self.args
+            post_name = None
+
+        if post_name:
+            try:
+                post, comment = post_name.split(".")
+            except ValueError:
+                post = post_name
+
+        # call CmdBBS.read_post.
+        if comment:
+            self.caller.execute_cmd(
+                "bb {}/{}.{}".format(board_name, post, comment))
+        elif post_name:
+            self.caller.execute_cmd("bb {}/{}".format(board_name, post))
+        else:
+            self.caller.execute_cmd("bb {}".format(board_name))
