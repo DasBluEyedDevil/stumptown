@@ -2,6 +2,7 @@
 BIO = [
     "full name",
     "concept",
+    "ssplat",
     "ambition",
     "sire",
     "desire",

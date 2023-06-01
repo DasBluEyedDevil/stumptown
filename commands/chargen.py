@@ -53,8 +53,10 @@ class cmdSplat(MuxCommand):
 
         # set the splat
         target.db.stats["splat"] = splat
+        target.db.stats["bio"]["splat"] = splat
+
         self.caller.msg(
-            "|wCG>|n splat |w{}|n set on |c{}|n.".format(splat, target.name))
+            "|wCG>|n |c{}'s|n splat has set to |w{}|n.".format(target.name, target.db.stats["splat"]))
 
 
 class cmdCg(MuxCommand):
@@ -399,6 +401,26 @@ class cmdSheet(MuxCommand):
 
             self.caller.msg(output)
 
+    def show_backgrounds(self, target):
+        """
+        This method shows the backgrounds of a character.
+        """
+        self.caller.msg(ANSIString("|wBackgrounds|n").center(78, "-"))
+        backgrounds = target.db.stats["backgrounds"]
+        output = ""
+        count = 0
+        for key, value in backgrounds.items():
+            output += format(key, value)+"  "
+            count += 1
+            if count == 3:
+                self.caller.msg(output)
+                output = "\n"
+                count = 0
+        if count != 0:
+            self.caller.msg(output)
+
+        self.caller.msg(output)
+
     def show_merits(self, target):
         """
         This method shows the merits of a character.
@@ -500,12 +522,13 @@ class cmdSheet(MuxCommand):
         self.caller.msg(self.show_bio(tar))
         self.caller.msg(self.show_attributes(tar))
         self.caller.msg(self.show_skills(tar))
+        self.caller.msg(self.show_backgrounds(tar))
         if tar.db.stats["merits"]:
             self.caller.msg(self.show_merits(tar))
         if tar.db.stats["flaws"]:
             self.caller.msg(self.show_flaws(tar))
         if tar.db.stats["disciplines"]:
             self.caller.msg(self.show_disciplines(tar))
-        if tar.db.stats["pools"]:
-            self.caller.msg(self.show_pools(tar))
+
+        self.caller.msg(self.show_pools(tar))
         self.caller.msg(ANSIString(ANSIString("|w=|n") * 78))
