@@ -79,6 +79,10 @@ class cmdCg(MuxCommand):
             self.caller.msg("You are already approved.")
             return
 
+        if not self.args:
+            self.caller.msg("Usage: +cg <trait>=<value>")
+            return
+
         # check for a target
         tar = target(self).get("target")
         key = target(self).get("key")

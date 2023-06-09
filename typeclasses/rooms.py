@@ -77,10 +77,10 @@ class Room(ObjectParent, DefaultRoom):
                     # if the listed char is admin or greater, show a star '* ' before the name
 
                     if char.locks.check_lockstring(char, "perm(Admin)"):
-                        charstring = ANSIString("|c*|n  %s|n" %
+                        charstring = ANSIString(" |c*|n  %s|n" %
                                                 char.get_display_name(looker)).ljust(20)
                     else:
-                        charstring = ANSIString("   %s|n" %
+                        charstring = ANSIString("    %s|n" %
                                                 char.get_display_name(looker)).ljust(20)
 
                     # show the idle time.  If the character is the looker, show 0s.
@@ -107,7 +107,7 @@ class Room(ObjectParent, DefaultRoom):
             count = 0
             for exit in exits:
                 if count % 3 == 0:
-                    output += "\n"
+                    output += "\n "
                 count += 1
 
                 output += ANSIString("%s  " %

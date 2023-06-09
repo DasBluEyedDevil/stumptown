@@ -37,4 +37,10 @@ class Exit(ObjectParent, DefaultExit):
                                         defined, in which case that will simply be echoed.
     """
 
-    pass
+    def get_display_name(self, looker=None, **kwargs):
+
+        # list the first aloias next to the full name of the exit.
+        if self.aliases.all():
+            return f"<|w{self.aliases.all()[0].upper()}|n> {self.name}"
+        else:
+            return super().get_display_name(looker, **kwargs)

@@ -244,12 +244,36 @@ MERITS_GOOD_VALUES = {
     "beautiful": {"values": [2]},
     "stunning": {"values": [4]},
     "high-functioning addict": {"values": [1]},
-    "bond resistance": {"values": [1], "check": lambda x: x["splat"] == "vampire", "check_message": "Bond Resistance is only available to vampires."},
-    "short bond": {"values": [2], "check": lambda x: x["splat"] == "vampire", "check_message": "Short Bond is only available to vampires."},
-    "unbondable": {"values": [4], "check": lambda x: x["splat"] == "vampire", "check_message": "Unbondable is only available to vampires."},
-    "bloodhound": {"values": [1],  "check": lambda x: x["splat"] == "vampire", "check_message": "Bloodhound is only available to vampires."},
-    "iron gullet": {"values": [1], "check": lambda x: x["splat"] == "vampire", "check_message": "Iron Gullet is only available to vampires."},
-    "eat food": {"values": [2], "check": lambda x: x["splat"] == "vampire", "check_message": "Eat Food is only available to vampires."}
+    "bond resistance": {
+        "values": [1],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Bond Resistance is only available to vampires."
+    },
+    "short bond": {
+        "values": [2],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Short Bond is only available to vampires."
+    },
+    "unbondable": {
+        "values": [4],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Unbondable is only available to vampires."
+    },
+    "bloodhound": {
+        "values": [1],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Bloodhound is only available to vampires."
+    },
+    "iron gullet": {
+        "values": [1],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Iron Gullet is only available to vampires."
+    },
+    "eat food": {
+        "values": [2],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Eat Food is only available to vampires."
+    }
 }
 
 
@@ -268,18 +292,65 @@ FLAWS_GOOD_VALUES = {
     "vile": {"values": [4]},
     "hopeless addiction": {"values": [2]},
     "addiction": {"values": [1]},
-    "archaic": {"values": [1], "check": lambda x: x["splat"] == "vampire", "check_message": "Archaic is only available to vampires."},
-    "living in the past": {"values": [1], "check": lambda x: x["splat"] == "vampire", "check_message": "Living in the Past is only available to vampires."},
-    "bondslave": {"values": [2], "check": lambda x: x["splat"] == "vampire", "check_message": "Bondslave is only available to vampires."},
-    "bond junkie": {"values": [1], "check": lambda x: x["splat"] == "vampire", "check_message": "Bond Junkie is only available to vampires."},
-    "long bond": {"values": [1], "check": lambda x: x["splat"] == "vampire", "check_message": "Long Bond is only available to vampires."},
-    "farmer": {"values": [2], "check": lambda x: x["splat"] == "vampire", "check_message": "Farmer is only available to vampires."},
-    "organavore": {"values": [2], "check": lambda x: x["splat"] == "vampire", "check_message": "Organavore is only available to vampires."},
-    "methuselah's thirst": {"values": [3], "check": lambda x: x["splat"] == "vampire", "check_message": "Methuselah's Thirst is only available to vampires."},
-    "prey exclusion": {"values": [1], "check": lambda x: x["splat"] == "vampire", "check_message": "Prey Exclusion is only available to vampires.", "instanced": True},
-    "stake bait": {"values": [1], "check": lambda x: x["splat"] == "vampire", "check_message": "Stake Bait is only available to vampires."},
-    "folklore bane": {"values": [1], "check": lambda x: x["splat"] == "vampire", "check_message": "Folklore Bane is only available to vampires."},
-    "folklore block": {"values": [2], "check": lambda x: x["splat"] == "vampire", "check_message": "Folklore Block is only available to vampires."},
+    "archaic": {
+        "values": [1], "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Archaic is only available to vampires."
+    },
+    "living in the past": {
+        "values": [1],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Living in the Past is only available to vampires."
+    },
+    "bondslave": {
+        "values": [2],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Bondslave is only available to vampires."
+    },
+    "bond junkie": {
+        "values": [1],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Bond Junkie is only available to vampires."
+    },
+    "long bond": {
+        "values": [1],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Long Bond is only available to vampires."
+    },
+    "farmer": {
+        "values": [2],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Farmer is only available to vampires."
+    },
+    "organavore": {
+        "values": [2],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Organavore is only available to vampires."
+    },
+    "methuselah's thirst": {
+        "values": [3], "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Methuselah's Thirst is only available to vampires."
+    },
+    "prey exclusion": {
+        "values": [1],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Prey Exclusion is only available to vampires.",
+        "instanced": True
+    },
+    "stake bait": {
+        "values": [1],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Stake Bait is only available to vampires."
+    },
+    "folklore bane": {
+        "values": [1],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Folklore Bane is only available to vampires."
+    },
+    "folklore block": {
+        "values": [2],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Folklore Block is only available to vampires."
+    },
 }
 
 
@@ -292,16 +363,51 @@ DISCIPLINES_GOOD_VALUES = {
         "instances": [],
         "has_specialties": True,
         "specialties": {
-            "bond famulus": {"values": [1], "check": lambda x: x.disciplines["animalism"] >= 1, "check_message": "Animalism 1 is required."},
-            "sense the beast":   {"values": [1], "check": lambda x: x.disciplines["animalism"] >= 1, "check_message": "Animalism 1 is required."},
-            "feral whispers":    {"values": [2], "check": lambda x: x.disciplines["animalism"] >= 2, "check_message": "Animalism 2 is required."},
-            "animal succulence": {"values": [3], "check": lambda x: x.disciplines["animalism"] >= 3, "check_message": "Animalism 3 is required."},
-            "quell the beast":   {"values": [3], "check": lambda x: x.disciplines["animalism"] >= 3, "check_message": "Animalism 3 is required."},
-            "living hive":       {"values": [3], "check": lambda x: x.disciplines["obfuscate"] >= 2 and x.disciplines["animalism"] >= 3, "check_message": "Obfuscate 2 and Animalism 3 are required."},
-            "subsume the spirit": {"values": [4], "check": lambda x: x.disciplines["animalism"] >= 4, "check_message": "Animalism 4 is required."},
-            "animal dominion":   {"values": [5], "check": lambda x: x.disciplines["animalism"] >= 5, "check_message": "Animalism 5 is required."},
-            "draw out the beast": {"values": [5], "check": lambda x: x.disciplines["animalism"] >= 5, "check_message": "Animalism 5 is required."},
-            "eat food": {"values": [2], "check": lambda x: x["splat"] == "vampire" >= 1, "check_message": "Animalism 1 is required."},
+            "bond famulus": {
+                "values": [1],
+                "check": lambda x: x.disciplines["animalism"] >= 1,
+                "check_message": "Animalism 1 is required."
+            },
+            "sense the beast": {
+                "values": [1],
+                "check": lambda x: x.disciplines["animalism"] >= 1,
+                "check_message": "Animalism 1 is required."
+            },
+            "feral whispers": {
+                "values": [2],
+                "check": lambda x: x.disciplines["animalism"] >= 2,
+                "check_message": "Animalism 2 is required."
+            },
+            "animal succulence": {
+                "values": [3],
+                "check": lambda x: x.disciplines["animalism"] >= 3,
+                "check_message": "Animalism 3 is required."
+            },
+            "quell the beast": {
+                "values": [3],
+                "check": lambda x: x.disciplines["animalism"] >= 3,
+                "check_message": "Animalism 3 is required."
+            },
+            "living hive": {
+                "values": [3],
+                "check": lambda x: x.disciplines["obfuscate"] >= 2 and x.disciplines["animalism"] >= 3,
+                "check_message": "Obfuscate 2 and Animalism 3 are required."
+            },
+            "subsume the spirit": {
+                "values": [4],
+                "check": lambda x: x.disciplines["animalism"] >= 4,
+                "check_message": "Animalism 4 is required."
+            },
+            "animal dominion": {
+                "values": [5],
+                "check": lambda x: x.disciplines["animalism"] >= 5,
+                "check_message": "Animalism 5 is required."
+            },
+            "draw out the beast": {
+                "values": [5],
+                "check": lambda x: x.disciplines["animalism"] >= 5,
+                "check_message": "Animalism 5 is required."
+            }
         },
     },
 
