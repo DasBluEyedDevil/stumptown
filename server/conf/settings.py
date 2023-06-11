@@ -36,6 +36,7 @@ from evennia.settings_default import *
 SERVERNAME = "Stumptown"
 INSTALLED_APPS += ('jobs',)
 INSTALLED_APPS += ('bbs',)
+INSTALLED_APPS += ('wiki',)
 
 COLOR_ANSI_EXTRA_MAP = color_markups.MUX_COLOR_ANSI_EXTRA_MAP
 COLOR_XTERM256_EXTRA_FG = color_markups.MUX_COLOR_XTERM256_EXTRA_FG
