@@ -123,13 +123,21 @@ class cmdNotes(MuxCommand):
                 self.list_notes_other(category, target)
                 return
         # if there's a name, or it's a number it's a specific note.
-        try:
-            name = int(name)
-            self.show_note_by_number(category, name)
+        # if there's a number, and the target is the caller it's a specific note.
+        if name.isdigit() and target == self.caller:
+            self.show_note_by_number(category, int(name))
             return
-        except ValueError:
-            self.show_note_by_name(category, name)
-            return
+        else:
+            # if there's a number, and the target is the caller it's a specific note.
+            if name.isdigit() and target != self.caller:
+
+                # builder+ can see notes on other people.
+                if self.caller.check_permstring("builders"):
+                    self.show_note_by_number_other(category, target, int(name))
+                    return
+                else:
+                    self.caller.msg("You can't read other people's notes.")
+                    return
 
     def list_notes(self, category):
         """
@@ -203,6 +211,24 @@ class cmdNotes(MuxCommand):
             self.caller.msg("I can't find that note.")
         return
 
+    def show_note_by_name_other(self, category, target, name):
+        """
+        Shows a specific note.
+        """
+        # if the category doesn't exist, then there are no notes.
+        if not target.db.notes.get(category):
+            if self.caller.check_permstring("builders"):
+                self.caller.msg("%s has no notes in the %s category." %
+                                (target, category))
+            return
+
+        # show the note
+        try:
+            self.caller.msg(target.db.notes[category][name])
+        except KeyError:
+            self.caller.msg("I can't find that note.")
+        return
+
     def show_note_by_number(self, category, number):
         """
         Shows a specific note.
@@ -222,6 +248,31 @@ class cmdNotes(MuxCommand):
         try:
             note = list(self.caller.db.notes[category].keys())[number]
             self.show_note_by_name(category, note)
+        except IndexError:
+            self.caller.msg("I can't find that note.")
+
+        return
+
+    def show_note_by_number_other(self, category, target, number):
+        """
+        Shows a specific note.
+        """
+        # if the category doesn't exist, then there are no notes.
+        if not target.db.notes.get(category):
+            self.caller.msg(
+                "They have no notes in the %s category." % category)
+            return
+
+        # if the number is out of range, tell the caller.
+        if number > len(target.db.notes[category]):
+            self.caller.msg("There is no note with that number.")
+            return
+
+        # show the note by index.  This is a bit of a hack, but it works.
+        # Make a list of the note titles, choose one, and vifew from that name.
+        try:
+            note = list(target.db.notes[category].keys())[number]
+            self.show_note_by_name_other(category, note, target)
         except IndexError:
             self.caller.msg("I can't find that note.")
 

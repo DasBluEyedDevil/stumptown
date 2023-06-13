@@ -147,8 +147,8 @@ POOLS = [
     "blood",
     "humanity",
     "morality",
-    "beats",
-    "xp"
+    "blood potency",
+    "hunger"
 ]
 
 
@@ -469,9 +469,6 @@ POOLS_GOOD_VALUES = {
     "humanity": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "check": lambda x: x["splat"] == "vampire"},
     "willpower": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]},
     "blood potency": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "check": lambda x: x["splat"] == "vampire"},
-    "vitae": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "check": lambda x: x["splat"] == "vampire"},
-    "beats": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]},
-    "xp": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]},
     "health": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]},
     "hunger": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "check": lambda x: x["splat"] == "vampire"},
 }
