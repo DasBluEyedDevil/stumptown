@@ -62,6 +62,6 @@ class dice(MuxCommand):
         s_list = "".join(output)
 
         self.caller.location.msg_contents(
-            f"|w+ROLL>|cn |c{self.caller.name}|n rolls |w{dice_pool}|n dice -> {successes} successes ({s_list})")
+            f"|w+ROLL>|n |c{self.caller.name}|n rolls |w{dice_pool}|n dice -> {successes} successes ({s_list})")
 
         # for every pair of 10s rolled, add 2 successes
