@@ -33,7 +33,7 @@ class cmdSplat(MuxCommand):
             target = self.caller.search(
                 self.lhs, global_search=True)
             if not target:
-                self.caller.msg("Could not find target.")
+                self.caller.msg("|w+CG>|n Could not find target.")
                 return
 
             splat = self.rhs
@@ -41,22 +41,23 @@ class cmdSplat(MuxCommand):
 
         # Check if a player is already approved.
         if target.db.approved == True:
-            self.caller.msg("You are already approved.")
+            self.caller.msg("|w+CG>|n You are already approved.")
             return
 
         # check for a valid splat
         if splat not in SPLATS:
-            self.caller.msg("|wCG>|n That is not a valid splat.")
-            self.caller.msg("|wCG>|n Valid splats are: |w{}|n".format(
-                ", ".join(SPLATS)))
+            self.caller.msg("|w+CG>|n That is not a valid splat.")
+            self.caller.msg("|w+CG>|n Valid splats are: |w{}|n".format(
+                ", ".join(map(lambda x: ANSIString(f"|w{x.capitalize()}|n"), SPLATS)))
+            )
             return
 
         # set the splat
-        target.db.stats["splat"] = splat
-        target.db.stats["bio"]["splat"] = splat
+        target.db.stats["splat"] = splat.lower()
+        target.db.stats["bio"] = {"splat": splat.lower()}
 
         self.caller.msg(
-            "|wCG>|n |c{}'s|n splat has set to |w{}|n.".format(target.name, target.db.stats["splat"]))
+            "|w+CG>|n |c{}'s|n splat has set to |w{}|n.".format(target.name, target.db.stats["splat"].upper()))
 
 
 class cmdCg(MuxCommand):
@@ -92,13 +93,13 @@ class cmdCg(MuxCommand):
 
         # check if caller is target.  Only admins can set other people's stats.
         if self.caller != tar and not self.caller.locks.check_lockstring(self.caller, "perm(Admin)"):
-            self.caller.msg("|WCG>|n You can only set your own stats.")
+            self.caller.msg("|W+CG>|n You can only set your own stats.")
             return
 
         # check for a valid target
         if not tar.db.stats["splat"]:
             self.caller.msg(
-                "|wCG>|n You must set |c%s's|n splat first." % tar.name)
+                "|w+CG>|n You must set |c%s's|n splat first." % tar.get_display_name(self.caller))
             return
 
         # check for a valid key
@@ -106,7 +107,7 @@ class cmdCg(MuxCommand):
         try:
             key = traits.get("trait")
         except AttributeError:
-            self.caller.msg("|wCG>|n That is not a valid trait.")
+            self.caller.msg("|w+CG>|n That is not a valid trait.")
             return
 
         # check for good values
@@ -119,7 +120,7 @@ class cmdCg(MuxCommand):
         if traits["check"]:
 
             if not traits["check"](tar.db.stats):
-                self.caller.msg("|wCG>|n> " + traits["check_message"])
+                self.caller.msg("|w+CG>|n> " + traits["check_message"])
                 return
 
         # check for instance
@@ -127,12 +128,12 @@ class cmdCg(MuxCommand):
             key = "%s(%s)" % (key.capitalize(), instance.capitalize())
 
         elif instance and not traits.get("instance"):
-            self.caller.msg("|wCG>|n That trait does not have instances.")
+            self.caller.msg("|w+CG>|n That trait does not have instances.")
             return
 
         elif not instance and traits.get("instance"):
             self.caller.msg(
-                "|wCG>|n You must specify an (instance) for |w%s()|n." % traits.get(key.capitalize()))
+                "|w+CG>|n You must specify an (instance) for |w%s()|n." % traits.get(key.capitalize()))
             return
 
         # check for spwcialties [<value>][/<specialty>]
@@ -152,7 +153,7 @@ class cmdCg(MuxCommand):
                         tar.db.stats["specialties"][key] = {specialty: value}
 
                     self.caller.msg(
-                        "|wCG>|n Specialty |w%s|n set on |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
+                        "|w+CG>|n Specialty |w%s|n set on |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
 
                     return
 
@@ -160,7 +161,7 @@ class cmdCg(MuxCommand):
             # check for a valid specialty
             if specialty not in traits["specialties"]:
                 self.caller.msg(
-                    "|wCG>|n That is not a valid specialty for |w%s|n." % key.upper())
+                    "|w+CG>|n That is not a valid specialty for |w%s|n." % key.upper())
                 return
 
             try:
@@ -171,7 +172,7 @@ class cmdCg(MuxCommand):
             # check for a valid value
             if value not in traits["specialties"][specialty]["values"]:
                 self.caller.msg(
-                    "|wCG>|n That is not a valid value for |w%s|n." % key.upper())
+                    "|w+CG>|n That is not a valid value for |w%s|n." % key.upper())
                 return
             else:
                 print(tar.db.stats[traits.get("category")].get(key))
@@ -185,7 +186,7 @@ class cmdCg(MuxCommand):
                         tar.db.stats["specialties"][key] = {specialty: value}
 
                     self.caller.msg(
-                        "|wCG>|n Specialty |w%s|n set on |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
+                        "|w+CG>|n Specialty |w%s|n set on |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
 
                     return
         # end specialties
@@ -199,7 +200,7 @@ class cmdCg(MuxCommand):
         if not value and tar.db.stats["specialties"].get(key).get(specialty):
             del tar.db.stats["specialties"][key][specialty]
             self.caller.msg(
-                "|wCG>|n Specialty |w%s|n removed from |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
+                "|w+CG>|n Specialty |w%s|n removed from |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
             return
 
         # if no value is given and no specialty is given, then remove the trait from the character.
@@ -213,13 +214,13 @@ class cmdCg(MuxCommand):
             if tar.db.stats["attributes"].get(key):
                 tar.db.stats["attributes"][key] = 1
             self.caller.msg(
-                "|wCG>|n |w%s|n removed from |c%s's|n sheet." % (key.upper(), tar.name))
+                "|w+CG>|n |w%s|n removed from |c%s's|n sheet." % (key.upper(), tar.name))
             return
 
         # check for valid values
         if traits["values"] and self.rhs not in traits["values"]:
             self.caller.msg(
-                "|wCG>|n That is not a valid value for |w%s|n." % key.upper())
+                "|w+CG>|n That is not a valid value for |w%s|n." % key.upper())
             return
 
         # set the value
@@ -228,7 +229,7 @@ class cmdCg(MuxCommand):
         except ValueError:
             tar.db.stats[traits.get("category")][key] = self.rhs
 
-        self.caller.msg("|wCG>|n |c%s's|n  |w%s|n set to|w %s|n." %
+        self.caller.msg("|w+CG>|n |c%s's|n  |w%s|n set to|w %s|n." %
                         (tar.name, key.upper(), self.rhs))
 
 
@@ -250,7 +251,6 @@ class cmdSheet(MuxCommand):
         """
         This method shows the bio of a character.
         """
-
         # first print the header.
         output = ANSIString("|wBio|n").center(78, "-")
         bio = []
@@ -514,6 +514,12 @@ class cmdSheet(MuxCommand):
         # check to see if caller
         req = target(self)
         tar = req.get("target")
+
+        # player has to ahve a splat set first!
+        if not tar.db.stats["bio"].get("splat"):
+            self.caller.msg(
+                "|w+CG>|n |yYou must select a splat before you can view your sheet.|n")
+            return
 
         # check if the target is the caller, or if the caller is admin.
         if self.caller != tar and not self.caller.locks.check_lockstring(self.caller, "perm(Admin)"):
