@@ -53,7 +53,7 @@ class Character(ObjectParent, DefaultCharacter):
             "specialties": {},
             "backgrounds": {},
             "pools": {},
-            "merits": {},
+            "advantages": {},
             "flaws": {},
             "bio": {},
             "splat": "",

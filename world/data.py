@@ -1,8 +1,9 @@
 
 BIO = [
     "full name",
+    "birthdate",
     "concept",
-    "ssplat",
+    "splat",
     "ambition",
     "sire",
     "desire",
@@ -108,7 +109,7 @@ SKILLS = [
 DISCIPLINES = [
     "animalism"
 ]
-MERITS = [
+ADVANTAGES = [
     "beautiful",
     "stunning",
     "high-functioning addict",
@@ -231,7 +232,7 @@ SKILLS_GOOD_VALUES = {
 }
 
 
-MERITS_GOOD_VALUES = {
+ADVANTAGES_GOOD_VALUES = {
     "default": {
         "values": [],
         "check": lambda x: True,
@@ -357,7 +358,6 @@ FLAWS_GOOD_VALUES = {
 DISCIPLINES_GOOD_VALUES = {
     "animalism": {
         "values": range(1, 6),
-        "check": lambda x: x["splat"] in "vampire",
         "check_message": "Animalism is only available to vampires.",
         "instanced": False,
         "instances": [],
@@ -410,7 +410,102 @@ DISCIPLINES_GOOD_VALUES = {
             }
         },
     },
-
+    "auspex": {
+        "has_specialties": True,
+        "check_message": "Auspex is only available to vampires.",
+        "specialties": {
+            "heightened senses": {
+                "value": 1,
+                "check": lambda x: x["auspex"] >= 1,
+                "check_message": "Auspex 1 is required."
+            },
+            "sense the unseen": {
+                "value": 1,
+                "check": lambda x: x["auspex"] >= 1,
+                "check_message": "Auspex 1 is required."
+            },
+            "premonition": {
+                "value": 2,
+                "check": lambda x: x["auspex"] >= 2,
+                "check_message": "Auspex 2 is required."
+            },
+            "scry the soul": {
+                "value": 3,
+                "check": lambda x: x["auspex"] >= 3,
+                "check_message": "Auspex 3 is required."
+            },
+            "shared senses": {
+                "value": 3, "check": lambda x: x["auspex"] >= 3,
+                "check_message": "Auspex 3 is required."
+            },
+            "spirits touch": {
+                "value": 4,
+                "check": lambda x: x["auspex"] >= 4,
+                "check_message": "Auspex 4 is required."
+            },
+            "clairvoyance": {
+                "value": 5,
+                "check": lambda x: x["auspex"] >= 5,
+                "check_message": "Auspex 5 is required."
+            },
+            "possession": {
+                "value": 5,
+                "check": lambda x: x["auspex"] >= 5 and x["dominate"] >= 3,
+                "check_message": "Auspex 5 and Dominate 3 are required."
+            },
+            "telepathy": {
+                "value": 5,
+                "check": lambda x: x["auspex"] >= 5,
+                "check_message": "Auspex 5 is required."
+            }
+        }
+    },
+    "celerity": {
+        "has_specialties": True,
+        "check_message": "Celerity is only available to vampires.",
+        "specialties": {
+            "cats grace": {
+                "value": 1,
+                "check": lambda x: x["celerity"] >= 1,
+                "check_message": "Celerity 1 is required."
+            },
+            "fleetness": {
+                "value": 2,
+                "check": lambda x: x["celerity"] >= 2,
+                "check_message": "Celerity 2 is required."
+            },
+            "blink": {
+                "value": 3,
+                "check": lambda x: x["celerity"] >= 3,
+                "check_message": "Celerity 3 is required."
+            },
+            "traversal": {
+                "value": 3,
+                "check": lambda x: x["celerity"] >= 3,
+                "check_message": "Celerity 3 is required."
+            },
+            "draught of elegance": {
+                "value": 4,
+                "check": lambda x: x["celerity"] >= 4,
+                "check_message": "Celerity 4 is required."
+            },
+            "unerring aim": {
+                "value": 4,
+                "check": lambda x: x["celerity"] >= 4 and x["auspex"] >= 2,
+                "check_message": "Celerity 4 and Auspex 2 are required."
+            },
+            "lightning strike": {
+                "value": 5,
+                "check": lambda x: x["celerity"] >= 5,
+                "check_message": "Celerity 5 is required."
+            },
+            "split second": {
+                "value": 5,
+                "check": lambda x: x["celerity"] >= 5,
+                "check_message": "Celerity 5 is required."
+            },
+        }
+    },
     "default": {
         "values": [],
         "check": lambda x: x["splat"] in "vampire",
@@ -422,27 +517,7 @@ DISCIPLINES_GOOD_VALUES = {
     }
 }
 
-# "auspex": {
-#     "heightened senses": {"value": 1, "check": lambda x: x["auspex"] >= 1},
-#     "sense the unseen": {"value": 1, "check": lambda x: x["auspex"] >= 1},
-#     "premonition": {"value": 2, "check": lambda x: x["auspex"] >= 2},
-#     "scry the soul": {"value": 3, "check": lambda x: x["auspex"] >= 3},
-#     "shared senses": {"value": 3, "check": lambda x: x["auspex"] >= 3},
-#     "spirits touch": {"value": 4, "check": lambda x: x["auspex"] >= 4},
-#     "clairvoyance": {"value": 5, "check": lambda x: x["auspex"] >= 5},
-#     "possession": {"value": 5, "check": lambda x: x["auspex"] >= 5 and x["dominate"] >= 3},
-#     "telepathy": {"value": 5, "check": lambda x: x["auspex"] >= 5}
-# },
-# "celerity": {
-#     "cats grace": {"value": 1, "check": lambda x: x["celerity"] >= 1},
-#     "fleetness": {"value": 2, "check": lambda x: x["celerity"] >= 2},
-#     "blink": {"value": 3, "check": lambda x: x["celerity"] >= 3},
-#     "traversal": {"value": 3, "check": lambda x: x["celerity"] >= 3},
-#     "draught of elegance": {"value": 4, "check": lambda x: x["celerity"] >= 4},
-#     "unerring aim": {"value": 4, "check": lambda x: x["celerity"] >= 4 and x["auspex"] >= 2},
-#     "lightning strike": {"value": 5, "check": lambda x: x["celerity"] >= 5},
-#     "split second": {"value": 5, "check": lambda x: x["celerity"] >= 5},
-# },
+
 # "dominate": {
 #     "cloud memory": {"value": 1, "check": lambda x: x["dominate"] >= 1},
 #     "compel": {"value": 1, "check": lambda x: x["dominate"] >= 1},
@@ -478,7 +553,7 @@ TOTAL_TRAITS = [
     ("bio", BIO, BIO_GOOD_VALUES),
     ("attributes", ATTRIBUTES, ATTRIBUTES_GOOD_VALUES),
     ("skills", SKILLS, SKILLS_GOOD_VALUES),
-    ("merits", MERITS, MERITS_GOOD_VALUES),
+    ("advantages", ADVANTAGES, ADVANTAGES_GOOD_VALUES),
     ("flaws", FLAWS, FLAWS_GOOD_VALUES),
     ("disciplines", DISCIPLINES, DISCIPLINES_GOOD_VALUES),
     ("pools", POOLS, POOLS_GOOD_VALUES),

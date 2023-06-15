@@ -2,7 +2,7 @@ from evennia.utils.ansi import ANSIString
 
 
 def target(context):
-    key = context.lhs
+    key = context.lhs.lower()
     target = context.caller
     instance = ""
     value = context.rhs or ""
@@ -66,13 +66,17 @@ def columns(col=[], col2=[], col3=[]):
 
 
 def format(key="", val=0, width=24, just="rjust", type=""):
+    title = "|w" if val else "|x"
+    title += key.capitalize() + ":|n"
+    text_val = "|w" if val else "|x"
+    text_val += str(val) + "|n"
     if just == "ljust":
         if type == "specialty":
-            return ANSIString(ANSIString("|w" + key.capitalize() + ":|n").ljust(20) + ANSIString("{}".format(val))).ljust(width)[0:width]
+            return ANSIString(ANSIString(title).ljust(20) + ANSIString("{}".format(str(val)))).ljust(width)[0:width]
         else:
-            return ANSIString(ANSIString("|w" + key.capitalize() + ":|n").ljust(15) + ANSIString("{}".format(val))).ljust(width)[0:width]
+            return ANSIString(ANSIString(title).ljust(15) + ANSIString("{}".format(str(val)))).ljust(width)[0:width]
     else:
         if type == "specialty":
-            return "  " + ANSIString(ANSIString("|w" + key.capitalize() + ":|n").ljust(width - 2 - len(ANSIString("{}".format(val))), ".") + "{}".format(val))
+            return "  " + ANSIString(ANSIString(title).ljust(width - 2 - len(ANSIString("{}".format(text_val))), ANSIString("|x.|n")) + "{}".format(text_val))
         else:
-            return ANSIString(ANSIString("|w" + key.capitalize() + ":|n").ljust(width - len(ANSIString("{}".format(val))), ".") + "{}".format(val))
+            return ANSIString(ANSIString(title).ljust(width - len(ANSIString("{}".format(text_val))), ANSIString("|x.|n")) + "{}".format(text_val))
