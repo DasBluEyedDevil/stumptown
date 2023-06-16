@@ -25,7 +25,7 @@ class cmdSplat(MuxCommand):
     key = "+splat"
     aliases = ["splat", "+splats", "splats"]
     locks = "cmd:all()"
-    help_category = "chargen"
+    help_category = "Character Generation"
 
     def func(self):
 
@@ -107,7 +107,7 @@ class cmdCg(MuxCommand):
     key = "+stats"
     aliases = ["stats", "stat", "+stat"]
     locks = "cmd:all()"
-    help_category = "chargen"
+    help_category = "character Generation"
 
     def func(self):
         # Unapproved characters can use this command.
@@ -302,7 +302,7 @@ class cmdSheet(MuxCommand):
     key = "+sheet"
     aliases = ["sheet"]
     locks = "cmd:all()"
-    help_category = "chargen"
+    help_category = "Character Generation"
 
     def show_bio(self, target):
         """
@@ -596,3 +596,26 @@ class cmdSheet(MuxCommand):
             self.caller.msg(self.show_disciplines(tar))
 
         self.caller.msg(ANSIString(ANSIString("|R=|n") * 78))
+
+
+class CmdShortDesc(MuxCommand):
+    """
+    Set your short description.
+
+    Usage:
+      +short <description>
+    """
+
+    key = "+short"
+    help_category = "Character Generation"
+    aliases = ["shortdesc", "+shortdesc", "short"]
+    locks = "cmd:all()"
+    help_category = "Character"
+
+    def func(self):
+        "Implement the command"
+        if not self.args:
+            self.caller.msg("Usage: +short <description>")
+            return
+        self.caller.db.shortdesc = self.args.strip()
+        self.caller.msg("Short description set to '%s'." % self.args.strip())

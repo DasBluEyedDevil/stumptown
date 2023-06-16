@@ -42,16 +42,21 @@ class Room(ObjectParent, DefaultRoom):
 
             time_str = ""
             if days > 0:
-                time_str = f"{days}d"
+                time_str = f"|x{days}d|n"
                 return time_str.strip()
             elif hours > 0:
                 time_str = f"{hours}h"
                 return time_str.strip()
             elif minutes > 0:
-                time_str = f"{minutes}m"
+                if minutes > 15:
+                    time_str = f"|y{minutes}m|n"
+                elif minutes > 20:
+                    time_str = f"|r{minutes}m|n"
+                else:
+                    time_str = f"|g{minutes}m|n"
                 return time_str.strip()
             elif seconds > 0:
-                time_str += f"{seconds}s"
+                time_str += f"|g{seconds}s|n"
                 return time_str.strip()
 
         # Get the description, build the string
@@ -63,13 +68,14 @@ class Room(ObjectParent, DefaultRoom):
         namestring = self.get_display_name(looker)
 
         # build the return string
-        output += ANSIString("[ |w%s|n ]" %
-                             namestring).center(78, ANSIString("|w=|n"))
+        output += ANSIString("|Y[|n |w%s|n |Y]|n" %
+                             namestring).center(78, ANSIString("|R=|n"))
         output += "\n\n%s\n\n" % description
         # display the characters in the room.
         characters = [char for char in self.contents if char.has_account]
         if characters:
-            output += ANSIString("[ |wCharacters|n ]").center(78, "-")
+            output += ANSIString("|w Characters |n").center(78,
+                                                            ANSIString("|R-|n"))
             for char in characters:
 
                 # if the looker can see the character, show the name, idle time and a short_desctiption
@@ -85,18 +91,18 @@ class Room(ObjectParent, DefaultRoom):
 
                     # show the idle time.  If the character is the looker, show 0s.
                     if char == looker:
-                        charstring += ANSIString("  |w0s|n").rjust(5)
+                        charstring += ANSIString("  |g0s|n").rjust(5)
                     else:
                         charstring += ANSIString("%s" %
                                                  format_time(char.idle_time)).rjust(5)
 
                     # if the character has a short_description, show it. ekse show how to set it.
-                    if char.db.short_description:
+                    if char.db.shortdesc:
                         charstring += ANSIString("  %s" %
-                                                 char.db.short_description).ljust(55)
+                                                 char.db.shortdesc).ljust(55)
                     else:
                         charstring += ANSIString(
-                            "  Use '+shortdesc <description>' to set this.|n")
+                            "|x  Use '+short <description>' to set this.|n")
 
                     output += "\n%s" % charstring
 
@@ -112,7 +118,7 @@ class Room(ObjectParent, DefaultRoom):
 
                 output += ANSIString("%s  " %
                                      exit.get_display_name(looker)).ljust(25)
-            output += "\n" + ANSIString("|w=|n" * 78)
+            output += "\n" + ANSIString("|R=|n" * 78)
         else:
-            output += "\n" + ANSIString("|w=|n" * 78)
+            output += "\n" + ANSIString("|R=|n" * 78)
         return output
