@@ -648,3 +648,69 @@ class CmdMoniker(MuxCommand):
             return
         self.caller.db.moniker = self.args.strip()
         self.caller.msg("Moniker set to '%s'." % self.args.strip())
+
+
+class CmdOOC(MuxCommand):
+    """
+    Send an OOC message.
+
+    Usage:
+      ooc <message>
+      ooc/style <OOC style>
+
+    Switches:
+        /style - sets your OOC style to the one specified.
+
+    """
+
+    key = "ooc"
+    help_category = "General"
+    locks = "cmd:all()"
+
+    def func(self):
+        "Implement function"
+
+        caller = self.caller
+
+        if "style" in self.switches:
+            if not self.args:
+                caller.msg("OOC style removed.")
+                self.caller.db.ooc_style = ""
+                return
+
+            self.caller.db.ooc_style = self.args.strip()
+            caller.msg("OOC style set to '%s'." %
+                       ANSIString(self.args.strip()))
+            return
+
+        if not self.args:
+            caller.msg("OOC what?")
+            return
+
+        speech = self.args.replace("ooc", "", 1).strip()
+
+        # Calling the at_pre_say hook on the character
+        speech = caller.at_pre_say(speech)
+
+        # If speech is empty, stop here
+        if not speech:
+            return
+        if speech[0] == ":":
+            speech = speech[1:]
+            speech = (self.caller.db.moniker or self.caller.name) + \
+                " " + speech
+        elif speech[0] == ";":
+            speech = speech[1:]
+            speech = (self.caller.db.moniker or self.caller.name) + speech
+        else:
+            speech = (self.caller.db.moniker or self.caller.name) + \
+                ' says, "' + speech + '"'
+        # If speech is empty, stop here
+        if not speech:
+            return
+
+        # Send to all in current location.
+        if self.caller.db.ooc_style:
+            caller.location.msg_contents(caller.db.ooc_style + " " + speech)
+        else:
+            caller.location.msg_contents("|w<|rOOC|n|w>|n " + speech)
