@@ -1,4 +1,29 @@
 
+
+STATS = {
+    "attributes": {
+        "strength": 1,
+        "dexterity": 1,
+        "stamina": 1,
+        "charisma": 1,
+        "manipulation": 1,
+        "composure": 1,
+        "intelligence": 1,
+        "wits": 1,
+        "resolve": 1
+    },
+    "skills": {},
+    "disciplines": {},
+    "specialties": {},
+    "backgrounds": {},
+    "pools": {},
+    "advantages": {},
+    "flaws": {},
+    "bio": {},
+    "splat": "",
+    "approved": False
+}
+
 BIO = [
     "full name",
     "birthdate",

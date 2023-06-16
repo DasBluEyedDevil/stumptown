@@ -4,7 +4,7 @@ This module contains the commands for character generation.
 """
 
 from evennia.commands.default.muxcommand import MuxCommand
-from world.data import BIO, get_trait_list, SPLATS, PHYSICAL, MENTAL, SOCIAL, SKILLS
+from world.data import BIO, get_trait_list, SPLATS, PHYSICAL, MENTAL, SOCIAL, SKILLS, STATS
 from evennia.utils.ansi import ANSIString
 from .utils import target, format
 
@@ -15,11 +15,13 @@ class cmdSplat(MuxCommand):
     done before any other chargen commands can be used.
 
     Usage:
+        +splats to see a list of valid splats.
         +splat [<target>=]<splat> - Sets the splat of the character.
+
     """
 
     key = "+splat"
-    aliases = ["splat"]
+    aliases = ["splat", "+splats", "splats"]
     locks = "cmd:all()"
     help_category = "chargen"
 
@@ -38,6 +40,14 @@ class cmdSplat(MuxCommand):
 
             splat = self.rhs
             target.db.stats.splat = splat
+
+        # if there are no args, list the splats available.
+        if not self.args:
+            self.caller.msg(
+                "|wSPLAT>|n Valid splats are: |w{}|n".format(
+                    ", ".join(map(lambda x: ANSIString(f"|w{x.capitalize()}|n"), SPLATS)))
+            )
+            return
 
         # Check if a player is already approved.
         if target.db.approved == True:
@@ -62,11 +72,34 @@ class cmdSplat(MuxCommand):
 
 class cmdCg(MuxCommand):
     """
-    This command is used to create a character. it is the main method of setting 
-    tour character's chargen settings.
+    This command is used to create a character. it is the main 
+    method of setting tour character's chargen settings.
+
+    WARNING!!  Before you can use this command, you must set your 
+    splat with +splat!
 
     Usage:
-        +cg [<target>/]<trait>=[<value>]
+        +stat [<target>/]<trait>=[<value>][/<specialty>]
+
+        examples:
+            +stat strength=3
+            +stat  athletics=2/Running
+
+            +stat Diablerie/strength=3
+            +stat Diablerie/athletics=2/Running
+
+            To reset a stat, leave the value blank.  When you resete 
+            a stat, you must also reset the specialties.
+
+                +stat strength=
+
+            To reset a specialty, leave the specialty blank.
+
+                +stat athletics=/Running
+
+        To reset your whole +sheet use |r+stats/wipe|n.
+
+    See also:  +splat +sheet
 
     """
     key = "+stats"
@@ -78,6 +111,20 @@ class cmdCg(MuxCommand):
         # Unapproved characters can use this command.
         if self.caller.db.stats["approved"] == True and not self.caller.locks.check_lockstring(self.caller, "perm(Admin)"):
             self.caller.msg("You are already approved.")
+            return
+
+        # if the command was +stats/wipe me=confirm, then wipe the stats.
+        if self.switches[0] == "wipe" and self.rhs == "confirm":
+            self.caller.db.stats = STATS
+            self.caller.msg("|wSTATS>|n Your stats have been wiped.")
+            return
+
+        # if the command was +stats/wipe. then comfirm they need to use +stats/wipe me=confirm
+        if self.switches[0] == "wipe":
+            self.caller.msg(
+                "|wSTATS>|n You are about to wipe your stats.  This cannot be undone.")
+            self.caller.msg(
+                "|wSTATS>|n To confirm, use: |r+stats/wipe me=confirm|n")
             return
 
         if not self.args:

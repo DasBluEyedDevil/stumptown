@@ -9,6 +9,7 @@ creation commands.
 """
 from evennia.objects.objects import DefaultCharacter
 from .objects import ObjectParent
+from world.data import STATS
 
 
 class Character(ObjectParent, DefaultCharacter):
@@ -36,26 +37,4 @@ class Character(ObjectParent, DefaultCharacter):
         super().at_object_creation()
 
         # initialize attributes
-        self.db.stats = {
-            "attributes": {
-                "strength": 1,
-                "dexterity": 1,
-                "stamina": 1,
-                "charisma": 1,
-                "manipulation": 1,
-                "composure": 1,
-                "intelligence": 1,
-                "wits": 1,
-                "resolve": 1
-            },
-            "skills": {},
-            "disciplines": {},
-            "specialties": {},
-            "backgrounds": {},
-            "pools": {},
-            "advantages": {},
-            "flaws": {},
-            "bio": {},
-            "splat": "",
-            "approved": False
-        }
+        self.db.stats = STATS
