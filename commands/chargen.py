@@ -115,19 +115,22 @@ class cmdCg(MuxCommand):
             self.caller.msg("You are already approved.")
             return
 
-        # if the command was +stats/wipe me=confirm, then wipe the stats.
-        if self.switches[0] == "wipe" and self.rhs == "confirm":
-            self.caller.db.stats = STATS
-            self.caller.msg("|wSTATS>|n Your stats have been wiped.")
-            return
+        try:
+            # if the command was +stats/wipe me=confirm, then wipe the stats.
+            if self.switches[0] == "wipe" and self.rhs == "confirm":
+                self.caller.db.stats = STATS
+                self.caller.msg("|wSTATS>|n Your stats have been wiped.")
+                return
 
-        # if the command was +stats/wipe. then comfirm they need to use +stats/wipe me=confirm
-        if self.switches[0] == "wipe":
-            self.caller.msg(
-                "|wSTATS>|n You are about to wipe your stats.  This cannot be undone.")
-            self.caller.msg(
-                "|wSTATS>|n To confirm, use: |r+stats/wipe me=confirm|n")
-            return
+            # if the command was +stats/wipe. then comfirm they need to use +stats/wipe me=confirm
+            if self.switches[0] == "wipe":
+                self.caller.msg(
+                    "|wSTATS>|n You are about to wipe your stats.  This cannot be undone.")
+                self.caller.msg(
+                    "|wSTATS>|n To confirm, use: |r+stats/wipe me=confirm|n")
+                return
+        except IndexError:
+            pass
 
         if not self.args:
             self.caller.msg("|wSTATS>|n Usage: +stat <trait>=<value>")
