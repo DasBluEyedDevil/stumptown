@@ -162,6 +162,8 @@ class cmdCg(MuxCommand):
             if specialty not in traits["specialties"]:
                 self.caller.msg(
                     "|wSTATS>|n That is not a valid specialty for |w%s|n." % key.upper())
+                self.caller.msg("|wSTATS>|n Valid specialties are: |w%s|n" % ", ".join(
+                    map(lambda x: ANSIString(f"|w{x}|n"), traits["specialties"].keys())))
                 return
 
             try:
@@ -254,7 +256,7 @@ class cmdSheet(MuxCommand):
         """
         # first print the header.
         output = ANSIString(
-            "[ |wCharacter Sheet|n for: |c{}|n ]".format(target.name)).center(78, ANSIString("|w=|n"))
+            "|Y[|n |wCharacter Sheet|n for: |c{}|n |Y]|n".format(target.name)).center(78, ANSIString("|R=|n"))
         bio = []
 
         for item in BIO:
@@ -290,7 +292,8 @@ class cmdSheet(MuxCommand):
         """
         This method shows the attributes of a character.
         """
-        self.caller.msg(ANSIString("|w Attributes |n").center(78, "="))
+        self.caller.msg(ANSIString("|w Attributes |n").center(
+            78, ANSIString("|R=|n")))
         # first we need to build our three lists.
         mental = []
         physical = []
@@ -343,7 +346,8 @@ class cmdSheet(MuxCommand):
         """
         This method shows the skills of a character.
         """
-        self.caller.msg(ANSIString("|w Skills |n").center(78, "="))
+        self.caller.msg(ANSIString("|w Skills |n").center(
+            78, ANSIString("|R=|n")))
         # first we need to build our three lists.
         mental = []
         physical = []
@@ -413,27 +417,65 @@ class cmdSheet(MuxCommand):
         """
         This method shows the disciplines of a character.
         """
-        self.caller.msg(ANSIString("|w Powers |n").center(78, "="))
-        # first we need to build our three lists.
+        output = ANSIString("|w Disciplines |n").center(
+            78, ANSIString("|R=|n"))
 
-        # Build the discipline list + specialties 1 column at a time and print it in
-        # up to 3 columns
-        disciplines = target.db.stats["disciplines"]
+        # first we build our two list
 
-        output = ""
-        for key, value in disciplines.items():
-            output += format(key, value, width=76) + "\n"
-            for specialty in target.db.stats["specialties"][key]:
-                output += format(specialty, 1,
-                                 type="specialty", width=76)
-        self.caller.msg(output)
+        disciplines = []
+        columns = []
+        for key, value in target.db.stats["disciplines"].items():
+            disciplines.append(format(key, value, width=24))
+            specialties = target.db.stats["specialties"].get(key)
+
+            if specialties:
+                for specialty in specialties:
+                    disciplines.append(
+                        format(specialty, specialties.get(specialty), type="specialty", width=24))
+            columns.append(disciplines)
+            disciplines = []
+
+         # for each column, get the longest entry and pad the rest of the entries to match.
+        for column in columns:
+            try:
+                max_length = max(len(columns[0]), len(
+                    columns[1]), len(columns[2]))
+            except IndexError:
+                try:
+                    max_length = max(len(columns[0]), len(columns[1]))
+                except IndexError:
+                    max_length = len(columns[0])
+
+            if len(column) < max_length:
+                for i in range(max_length - len(column)):
+                    column.append(" " * 24)
+
+        # now we need to print the lists by row.  Two columns per row. if we have more than 2 columns, we need to print
+        # the first two columns, then the next two columns, etc.
+        # if we have an odd number of columns, we need to print the last column by itself.
+        # if we have an even number of columns, we need to print the last two columns together.
+        # if we have more than 4 columns, we need to print the first two columns, then the next two columns, etc.
+        for i in range(0, len(columns), 3):
+            for j in range(max_length):
+                output += "\n "
+                output += columns[i][j]
+                if i + 1 < len(columns):
+                    output += "  " + columns[i + 1][j]
+                if i + 2 < len(columns):
+                    output += "  " + columns[i + 2][j]
+
+            if (i + 3 < len(columns)):
+                output += "\n"
+
+        if len(columns) > 0:
+            self.caller.msg(output.strip())
 
     def show_advantages(self, target):
         """
         This method shows the advantages of a character.
         """
-        output = ANSIString("|w Advantages |n").center(39, "=")
-        output += ANSIString("|w Flaws |n").center(39, "=")
+        output = ANSIString("|w Advantages |n").center(39, ANSIString("|R=|n"))
+        output += ANSIString("|w Flaws |n").center(39, ANSIString("|R=|n"))
 
         # first we build our two lists.
         raw_advantages = target.db.stats["advantages"]
@@ -455,31 +497,12 @@ class cmdSheet(MuxCommand):
         if len(raw_flaws) < max_length:
             for i in range(max_length - len(raw_flaws)):
                 flaws.append(" " * 36)
-        count = 0
+
         # now we need to print the lists.
         for i in range(max_length):
 
             output += "\n " + advantages[i] + "  " + flaws[i]
-        self.caller.msg(output)
-
-    def show_pools(self, target):
-        """
-        This method shows the pools of a character.
-        """
-        output = ANSIString("|wPools|n").center(78, "-")
-        # first we need to build our three lists.
-
-        # get the pools list from the target, put it through the formatter
-        # and print it with three columns
-        pools = target.db.stats["pools"]
-        count = 0
-        for key, value in pools.items():
-            if count % 3 == 0:
-                self.caller.msg(output)
-                output += "\n "
-            output += format(key, value)+"  "
-            count += 1
-        if count != 0:
+        if max_length > 0:
             self.caller.msg(output)
 
     def func(self):
@@ -515,6 +538,7 @@ class cmdSheet(MuxCommand):
         self.caller.msg(self.show_attributes(tar))
         self.caller.msg(self.show_skills(tar))
         self.caller.msg(self.show_advantages(tar))
-        if tar.db.stats["disciplines"]:
+        if tar.db.stats["bio"].get("splat") == "vampire":
             self.caller.msg(self.show_disciplines(tar))
-        self.caller.msg(ANSIString(ANSIString("|w=|n") * 78))
+
+        self.caller.msg(ANSIString(ANSIString("|R=|n") * 78))
