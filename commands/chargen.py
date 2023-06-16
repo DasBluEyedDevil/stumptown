@@ -18,6 +18,8 @@ class cmdSplat(MuxCommand):
         +splats to see a list of valid splats.
         +splat [<target>=]<splat> - Sets the splat of the character.
 
+    see also: +sheet +stats
+
     """
 
     key = "+splat"
@@ -290,6 +292,8 @@ class cmdSheet(MuxCommand):
 
     Usage:
         +sheet [<target>]
+
+    See also: +stats, +splat
     """
 
     key = "+sheet"
