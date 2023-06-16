@@ -45,12 +45,16 @@ class Room(ObjectParent, DefaultRoom):
                 time_str = f"|x{days}d|n"
                 return time_str.strip()
             elif hours > 0:
-                time_str = f"{hours}h"
+                time_str = f"|x{hours}h|n"
                 return time_str.strip()
             elif minutes > 0:
-                if minutes > 15:
+                if minutes > 10 and minutes < 15:
+                    time_str = f"|G{minutes}m|n"
+                elif minutes > 15 and minutes < 20:
                     time_str = f"|y{minutes}m|n"
-                elif minutes > 20:
+                elif minutes > 20 and minutes < 30:
+                    time_str = f"|r{minutes}m|n"
+                elif minutes > 30 and minutes:
                     time_str = f"|r{minutes}m|n"
                 else:
                     time_str = f"|g{minutes}m|n"
@@ -109,7 +113,8 @@ class Room(ObjectParent, DefaultRoom):
         # display the exits  in the room if there are any
         exits = [exit for exit in self.contents if exit.destination]
         if exits:
-            output += "\n" + ANSIString("[ |wExits|n ]").center(78, "-")
+            output += "\n" + \
+                ANSIString(" |wExits|n ").center(78, ANSIString("|R-|n"))
             count = 0
             for exit in exits:
                 if count % 3 == 0:

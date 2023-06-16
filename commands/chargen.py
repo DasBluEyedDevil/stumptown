@@ -619,3 +619,32 @@ class CmdShortDesc(MuxCommand):
             return
         self.caller.db.shortdesc = self.args.strip()
         self.caller.msg("Short description set to '%s'." % self.args.strip())
+
+
+class CmdMoniker(MuxCommand):
+    """
+    Set your moniker.
+
+    Usage:
+      +moniker <moniker>
+    """
+
+    key = "+moniker"
+    help_category = "Character Generation"
+    aliases = ["moniker", "+moniker"]
+    locks = "cmd:all()"
+    help_category = "Character"
+
+    def func(self):
+        "Implement the command"
+
+        # check to see if caller is builder+
+        if not self.caller.locks.check_lockstring(self.caller, "perm(Builder)"):
+            self.caller.msg("|wCG>|n Pwemission Denied.")
+            return
+
+        if not self.args:
+            self.caller.msg("Usage: +moniker <moniker>")
+            return
+        self.caller.db.moniker = self.args.strip()
+        self.caller.msg("Moniker set to '%s'." % self.args.strip())
