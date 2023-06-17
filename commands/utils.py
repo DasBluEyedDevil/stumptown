@@ -15,7 +15,6 @@ def target(context):
         key = key.split("/")[1]
 
         if not key:
-            context.caller.msg("Could not find target.")
             return
 
         # Split the key into the fixed key.
@@ -65,11 +64,13 @@ def columns(col=[], col2=[], col3=[]):
     return output
 
 
-def format(key="", val=0, width=24, just="rjust", type=""):
+def format(key="", val=0, width=24, just="rjust", type="", temp=0):
     title = "|w" if val else "|x"
     title += key.capitalize() + ":|n"
     text_val = "|w" if val else "|x"
     text_val += str(val) + "|n"
+    if temp:
+        text_val += f"|w({temp})|n"
     if just == "ljust":
         if type == "specialty":
             return ANSIString(ANSIString(title).ljust(20) + ANSIString("{}".format(str(val)))).ljust(width)[0:width]

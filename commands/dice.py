@@ -10,11 +10,16 @@ class dice(MuxCommand):
 
     Usage:
         +roll <dice pool>
+        +roll/perm <dice pool>
+
+        The first form of this command rolls a dice pool, which is a combination of
+        sheet traits plus numbers.  It takes temp scores into account.  The seccond
+        form of this command only works with your permentant values in your traits.
 
     Example:
         +roll str + brawl  + 2
         +roll 5
-        +roll 5 + 2
+        +roll/perm dex + melee
         +roll dex + 2 - 1
 
         This command also akes the hunger mechanic itto account.
@@ -102,8 +107,20 @@ class dice(MuxCommand):
                 if res:
                     # Try to add their dice in the trait to the dice pool
                     try:
-                        dice_pool += self.caller.db.stats[res.get(
+
+                        value = self.caller.db.stats[res.get(
                             'category')][res.get('trait')]
+
+                        # if there's a temp value, add it to the dice pool
+                        try:
+                            temp = self.caller.db.stats["temp"][res.get(
+                                "trait")]
+                        except KeyError:
+                            temp = 0
+                        if "perm" in self.switches:
+                            dice_pool += value
+                        else:
+                            dice_pool += max(value, temp)
                         # Append the dice list with the actual name of the trait.
                         dice.append(arg[0] + res.get('trait'))
                     except KeyError:
@@ -122,15 +139,26 @@ class dice(MuxCommand):
                     if res:
                         # Try to add their dice in the trait to the dice pool
                         try:
-                            dice_pool += int(self.caller.db.stats[res.get(
-                                'category')][res.get('trait')])
+
+                            value = self.caller.db.stats[res.get(
+                                'category')][res.get('trait')]
+
+                            # if there's a temp value, add it to the dice pool
+                            try:
+                                temp = self.caller.db.stats["temp"].get(
+                                    res.get("trait"))
+                            except KeyError:
+                                temp = 0
+                            if "perm" in self.switches:
+                                dice_pool += value
+                            else:
+                                dice_pool += max(value, temp)
+
                             # Append the dice list with the actual name of the trait.
                             dice.append(res.get('trait'))
                         except KeyError:
                             # if tehre's no dice behind it, still add the trait to the output.
                             dice.append(res.get('trait'))
-                        except ValueError:
-                            pass
 
         mod_dice_pool = dice_pool - hunger
         if mod_dice_pool <= 0:

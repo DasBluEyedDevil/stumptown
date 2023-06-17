@@ -81,11 +81,13 @@ class cmdCg(MuxCommand):
     splat with +splat!
 
     Usage:
-        +stat [<target>/]<trait>=[<value>][/<specialty>]
+        +stat[/temp] [<target>/]<trait>=[<value>][/<specialty>]
+
 
         examples:
             +stat strength=3
             +stat  athletics=2/Running
+            +stat/temp str=3
 
             +stat Diablerie/strength=3
             +stat Diablerie/athletics=2/Running
@@ -105,7 +107,7 @@ class cmdCg(MuxCommand):
 
     """
     key = "+stats"
-    aliases = ["stats", "stat", "+stat"]
+    aliases = ["stat"]
     locks = "cmd:all()"
     help_category = "character Generation"
 
@@ -266,15 +268,28 @@ class cmdCg(MuxCommand):
         # if the trait has specialties, remove them as well.
         # if the trait is an attribute, then just reset it to 1.
         if not value and not specialty:
-            if tar.db.stats["specialties"].get(key):
-                del tar.db.stats["specialties"][key]
-            if tar.db.stats[traits.get("category")].get(key):
-                del tar.db.stats[traits.get("category")][key]
-            if tar.db.stats["attributes"].get(key):
-                tar.db.stats["attributes"][key] = 1
-            self.caller.msg(
-                "|wSTATS>|n |w%s|n removed from |c%s's|n sheet." % (key.upper(), tar.name))
-            return
+
+            if "temp" in self.switches:
+                if tar.db.stats["temp"].get(key):
+                    del tar.db.stats["temp"][key]
+                self.caller.msg(
+                    "|wSTATS>|n (temp) |w%s|n removed from |c%s's|n sheet." % (key.upper(), tar.name))
+                return
+            else:
+                if tar.db.stats["specialties"].get(key):
+                    del tar.db.stats["specialties"][key]
+                if tar.db.stats[traits.get("category")].get(key):
+                    if traits.get("category") == "attributes":
+                        tar.db.stats[traits.get("category")][key] = 1
+                    else:
+                        del tar.db.stats[traits.get("category")][key]
+                    # if there's a temp value remove it as well
+                    if tar.db.stats["temp"].get(key):
+                        del tar.db.stats["temp"][key]
+
+                self.caller.msg(
+                    "|wSTATS>|n |w%s|n removed from |c%s's|n sheet." % (key.upper(), tar.name))
+                return
 
         # check for valid values
         if traits["values"] and self.rhs not in traits["values"]:
@@ -283,13 +298,27 @@ class cmdCg(MuxCommand):
             return
 
         # set the value
-        try:
-            tar.db.stats[traits.get("category")][key] = int(self.rhs)
-        except ValueError:
-            tar.db.stats[traits.get("category")][key] = self.rhs
+        if "temp" in self.switches:
+            try:
+                tar.db.stats["temp"][key] = int(self.rhs)
+            except KeyError:
+                tar.db.stats["temp"] = {}
+                tar.db.stats["temp"][key] = int(self.rhs)
 
-        self.caller.msg("|wSTATS>|n |c%s's|n  |w%s|n set to|w %s|n." %
-                        (tar.name, key.upper(), self.rhs))
+            except ValueError:
+                tar.db.stats["temp"][key] = self.rhs
+
+            self.caller.msg("|wSTATS>|n |c%s's|n (temp) |w%s|n set to|w %s|n." % (
+                tar.name, key.upper(), self.rhs))
+            return
+        else:
+            try:
+                tar.db.stats[traits.get("category")][key] = int(self.rhs)
+            except ValueError:
+                tar.db.stats[traits.get("category")][key] = self.rhs
+
+            self.caller.msg("|wSTATS>|n |c%s's|n  |w%s|n set to|w %s|n." %
+                            (tar.name, key.upper(), self.rhs))
 
 
 class cmdSheet(MuxCommand):
@@ -357,65 +386,111 @@ class cmdSheet(MuxCommand):
         physical = []
         social = []
 
+        # Do they have a tempstat?
+        try:
+            if not target.db.stats["temp"]:
+                target.db.stats["temp"] = {}
+        except KeyError:
+            target.db.stats["temp"] = {}
+
         # now we need to sort the attributes into their lists.
+        # check if they have a temp value.  if so, record it.
 
         try:
             strength = target.db.stats["attributes"]["strength"]
+            temp_strength = 0
+            if target.db.stats["temp"].get("strength"):
+                temp_strength = target.db.stats["temp"]["strength"] or 0
         except KeyError:
             strength = 0
+            temp_strength = 0
 
         try:
             dexterity = target.db.stats["attributes"]["dexterity"]
+            temp_dexterity = 0
+            if target.db.stats["temp"].get("dexterity"):
+                temp_dexterity = target.db.stats["temp"]["dexterity"] or 0
         except KeyError:
             dexterity = 0
+            temp_dexterity = 0
 
         try:
             stamina = target.db.stats["attributes"]["stamina"]
+            temp_stamina = 0
+            if target.db.stats["temp"].get("stamina"):
+                temp_stamina = target.db.stats["temp"]["stamina"] or 0
         except KeyError:
             stamina = 0
+            temp_stamina = 0
 
         try:
             charisma = target.db.stats["attributes"]["charisma"]
+            temp_charisma = 0
+            if target.db.stats["temp"].get("charisma"):
+                temp_charisma = target.db.stats["temp"]["charisma"] or 0
         except KeyError:
             charisma = 0
+            temp_charisma = 0
 
         try:
             manipulation = target.db.stats["attributes"]["manipulation"]
+            temp_manipulation = 0
+            if target.db.stats["temp"].get("manipulation"):
+                temp_manipulation = target.db.stats["temp"]["manipulation"] or 0
         except KeyError:
             manipulation = 0
+            temp_manipulation = 0
 
         try:
             composure = target.db.stats["attributes"]["composure"]
+            temp_composure = 0
+            if target.db.stats["temp"].get("composure"):
+                temp_composure = target.db.stats["temp"]["comppsure"] or 0
         except KeyError:
             composure = 0
+            temp_composure = 0
 
         try:
             resolve = target.db.stats["attributes"]["resolve"]
+            temp_resolve = 0
+            if target.db.stats["temp"].get("resolve"):
+                temp_resolve = target.db.stats["temp"]["resolve"] or 0
         except KeyError:
             resolve = 0
+            temp_resolve = 0
 
         try:
             intelligence = target.db.stats["attributes"]["intelligence"]
+            temp_intelliegence = 0
+            if target.db.stats["temp"].get("intelliegence"):
+                temp_intelliegence = target.db.stats["temp"]["intelliegence"] or 0
         except KeyError:
             intelligence = 0
+            temp_intelliegence = 0
 
         try:
             wits = target.db.stats["attributes"]["wits"]
+            temp_wits = 0
+            if target.db.stats["temp"].get("wits"):
+                temp_wits = target.db.stats["temp"]["wits"] or 0
         except KeyError:
             wits = 0
+            temp_wits = 0
 
         # Now we need to format the output.
-        mental.append(format("Intelligence", intelligence))
-        mental.append(format("Wits", wits))
-        mental.append(format("Resolve", resolve))
+        mental.append(format("Intelligence", intelligence,
+                      temp=temp_intelliegence))
+        mental.append(format("Wits", wits, temp=temp_wits))
+        mental.append(format("Resolve", resolve, temp=temp_resolve))
 
-        physical.append(format("Strength", strength))
-        physical.append(format("Dexterity", dexterity))
-        physical.append(format("Stamina", stamina))
+        physical.append(format("Strength", strength, temp=temp_strength))
+        physical.append(format("Dexterity", dexterity, temp=temp_dexterity))
+        physical.append(format("Stamina", stamina, temp=temp_stamina))
 
-        social.append(format("Charisma", charisma))
-        social.append(format("Manipulation", manipulation))
-        social.append(format("Composure", composure))
+        social.append(format("Charisma", charisma, temp=temp_charisma))
+        social.append(
+            format("Manipulation", manipulation, temp=temp_manipulation))
+        social.append(format("Composure", composure, temp=temp_composure))
 
         # Now we need to print the output.
         output = "Physical".center(
@@ -456,24 +531,16 @@ class cmdSheet(MuxCommand):
             # That it's a specialty.
             specialties = target.db.stats["specialties"].get(key)
 
-            if key in MENTAL:
-                mental.append(format(key, value))
-                if specialties:
-                    for specialty in specialties:
-                        mental.append(
-                            format(specialty, specialties.get(specialty), type="specialty"))
-            elif key in PHYSICAL:
-                physical.append(format(key, value))
-                if specialties:
-                    for specialty in specialties:
-                        physical.append(
-                            format(specialty, specialties.get(specialty), type="specialty"))
-            elif key in SOCIAL:
-                social.append((format(key, value)))
-                if specialties:
-                    for specialty in specialties:
-                        social.append(
-                            format(specialty, specialties.get(specialty), type="specialty"))
+            keys = [(PHYSICAL, physical), (MENTAL, mental), (SOCIAL, social)]
+            for i in keys:
+                if key in i[0]:
+                    temp = target.db.stats["temp"].get(key) or 0
+
+                    i[1].append(format(key, value, temp=temp))
+                    if specialties:
+                        for specialty in specialties:
+                            i[1].append(
+                                format(specialty, specialties.get(specialty), type="specialty"))
 
         # now we need to print the three lists. if one list is shorter than the others, we need to pad it.
         # if the list is shorter than the others, we need to pad it.
