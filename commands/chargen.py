@@ -429,7 +429,7 @@ class cmdSheet(MuxCommand):
             output += social[i]
             output += "\n"
 
-        self.caller.msg(output.strip())
+        self.caller.msg(output.rstrip())
 
     def show_skills(self, target):
         """
