@@ -147,13 +147,17 @@ class dice(MuxCommand):
                             temp = 0
                             try:
                                 temp = self.caller.db.stats["temp"].get(
-                                    res.get("trait"))
+                                    res.get("trait")) or 0
                             except KeyError:
                                 temp = 0
+
                             if "perm" in self.switches:
                                 dice_pool += value
                             else:
-                                dice_pool += max(value, temp)
+                                try:
+                                    dice_pool += max(value, temp)
+                                except TypeError:
+                                    dice_pool += value
 
                             # Append the dice list with the actual name of the trait.
                             dice.append(res.get('trait'))
