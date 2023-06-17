@@ -167,6 +167,8 @@ class cmdCg(MuxCommand):
             self.rhs = int(self.rhs)
         except ValueError:
             pass
+        except TypeError:
+            pass
 
         # check to see if we pass the check
         if traits["check"]:
@@ -252,12 +254,14 @@ class cmdCg(MuxCommand):
 
         # if no value is given and a matching specialty for the key is found (case insenstiive)
         # then remove the specialty from the character.
-        if not value and tar.db.stats["specialties"].get(key).get(specialty):
-            del tar.db.stats["specialties"][key][specialty]
-            self.caller.msg(
-                "|wSTATS>|n Specialty |w%s|n removed from |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
-            return
-
+        try:
+            if not value and tar.db.stats["specialties"].get(key).get(specialty):
+                del tar.db.stats["specialties"][key][specialty]
+                self.caller.msg(
+                    "|wSTATS>|n Specialty |w%s|n removed from |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
+                return
+        except AttributeError:
+            pass
         # if no value is given and no specialty is given, then remove the trait from the character.
         # if the trait has specialties, remove them as well.
         # if the trait is an attribute, then just reset it to 1.
