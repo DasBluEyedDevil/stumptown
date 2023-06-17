@@ -144,6 +144,7 @@ class dice(MuxCommand):
                                 'category')][res.get('trait')]
 
                             # if there's a temp value, add it to the dice pool
+                            temp = 0
                             try:
                                 temp = self.caller.db.stats["temp"].get(
                                     res.get("trait"))
