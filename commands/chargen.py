@@ -359,46 +359,77 @@ class cmdSheet(MuxCommand):
 
         # now we need to sort the attributes into their lists.
 
-        for key, value in target.db.stats["attributes"].items():
-            if key in MENTAL:
-                mental.append(format(key, value))
-            elif key in PHYSICAL:
-                physical.append(format(key, value))
-            elif key in SOCIAL:
-                social.append((format(key, value)))
+        try:
+            strength = target.db.stats["attributes"]["strength"]
+        except KeyError:
+            strength = 0
 
-        # now we need to print the lists.
-        # first print the three headers.
-        output = ANSIString("Physical").center(
-            26) + ANSIString("Mental").center(26) + ANSIString("Social").center(26)
+        try:
+            dexterity = target.db.stats["attributes"]["dexterity"]
+        except KeyError:
+            dexterity = 0
+
+        try:
+            stamina = target.db.stats["attributes"]["stamina"]
+        except KeyError:
+            stamina = 0
+
+        try:
+            charisma = target.db.stats["attributes"]["charisma"]
+        except KeyError:
+            charisma = 0
+
+        try:
+            manipulation = target.db.stats["attributes"]["manipulation"]
+        except KeyError:
+            manipulation = 0
+
+        try:
+            composure = target.db.stats["attributes"]["composure"]
+        except KeyError:
+            composure = 0
+
+        try:
+            resolve = target.db.stats["attributes"]["resolve"]
+        except KeyError:
+            resolve = 0
+
+        try:
+            intelligence = target.db.stats["attributes"]["intelligence"]
+        except KeyError:
+            intelligence = 0
+
+        try:
+            wits = target.db.stats["attributes"]["wits"]
+        except KeyError:
+            wits = 0
+
+        # Now we need to format the output.
+        mental.append(format("Intelligence", intelligence))
+        mental.append(format("Wits", wits))
+        mental.append(format("Resolve", resolve))
+
+        physical.append(format("Strength", strength))
+        physical.append(format("Dexterity", dexterity))
+        physical.append(format("Stamina", stamina))
+
+        social.append(format("Charisma", charisma))
+        social.append(format("Manipulation", manipulation))
+        social.append(format("Composure", composure))
+
+        # Now we need to print the output.
+        output = "Physical".center(
+            26) + "Mental".center(26) + "Social".center(26) + "\n"
+        for i in range(0, 3):
+            output += " "
+            output += physical[i]
+            output += "  "
+            output += mental[i]
+            output += "  "
+            output += social[i]
+            output += "\n"
+
         self.caller.msg(output)
-
-        # now we need to print the three lists. if one list is shorter than the others, we need to pad it.
-        # if the list is shorter than the others, we need to pad it.
-        mental_length = len(mental)
-        physical_length = len(physical)
-        social_length = len(social)
-
-        # now we need to determine which list is the longest.
-        longest = max(mental_length, physical_length, social_length)
-
-        # now we need to pad the lists.
-        if mental_length < longest:
-            for i in range(longest - mental_length):
-                mental.append(" ")
-        if physical_length < longest:
-            for i in range(longest - physical_length):
-                physical.append(" ")
-        if social_length < longest:
-            for i in range(longest - social_length):
-                social.append(" ")
-        # now we need to print the lists.
-        for i in range(longest):
-            output = " " + physical[i]
-            output += "  " + mental[i]
-            output += "  " + social[i]
-
-            self.caller.msg(output)
 
     def show_skills(self, target):
         """
