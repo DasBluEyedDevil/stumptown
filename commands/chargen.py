@@ -152,8 +152,12 @@ class cmdCg(MuxCommand):
 
         # check for a valid target
         if not tar.db.stats["splat"]:
-            self.caller.msg(
-                "|wSTATS>|n You must set |c%s's|n splat first." % tar.get_display_name(self.caller))
+            if tar == self.caller:
+                self.caller.msg(
+                    "|wSTATS>|n You must set your splat first.")
+            else:
+                self.caller.msg(
+                    "|wSTATS>|n You must set |c%s's|n splat first." % tar.get_display_name(self.caller))
             return
 
         # check for a valid key
@@ -230,7 +234,10 @@ class cmdCg(MuxCommand):
             # check for a valid value
             if value not in traits["specialties"][specialty]["values"]:
                 self.caller.msg(
-                    "|wSTATS>|n That is not a valid value for |w%s|n." % key.upper())
+                    "|wSTATS>|n That is not a valid value for |w%s|n." % (specialty.upper() or key.upper()))
+                self.caller.msg("|wSTATS>|n Valid values are: |w%s|n" % ", ".join(
+                    map(lambda x: ANSIString(f"|w{x}|n"), traits["specialties"][specialty]["values"])))
+
                 return
             else:
                 print(tar.db.stats[traits.get("category")].get(key))
@@ -630,34 +637,41 @@ class cmdSheet(MuxCommand):
         """
         This method shows the advantages of a character.
         """
-        output = ANSIString("|w Advantages |n").center(39, ANSIString("|R=|n"))
-        output += ANSIString("|w Flaws |n").center(39, ANSIString("|R=|n"))
+        output = ANSIString("|w Advantages |n").center(26, ANSIString("|R=|n"))
+        output += ANSIString("|w Flaws |n").center(26, ANSIString("|R=|n"))
+        output += ANSIString("|w Pools |n").center(26, ANSIString("|R=|n"))
 
         # first we build our two lists.
         raw_advantages = target.db.stats["advantages"]
         raw_flaws = target.db.stats["flaws"]
         advantages = []
         flaws = []
+        pools = []
 
         # fill in format entry for advanaages and flaws
         for key, value in raw_advantages.items():
-            advantages.append(format(key, value, width=37))
+            advantages.append(format(key, value, width=24))
         for key, value in raw_flaws.items():
-            flaws.append(format(key, value, width=37))
+            flaws.append(format(key, value, width=24))
+        for key, value in target.db.stats["pools"].items():
+            pools.append(format(key, value, width=24))
 
         # get the max length and pad the end of the list with spaces
-        max_length = max(len(raw_advantages), len(flaws))
+        max_length = max(len(raw_advantages), len(flaws), len(pools))
         if len(raw_advantages) < max_length:
             for i in range(max_length - len(raw_advantages)):
-                advantages.append(" " * 36)
+                advantages.append(" " * 24)
         if len(raw_flaws) < max_length:
             for i in range(max_length - len(raw_flaws)):
-                flaws.append(" " * 36)
+                flaws.append(" " * 24)
+        if len(pools) < max_length:
+            for i in range(max_length - len(pools)):
+                pools.append(" " * 24)
 
         # now we need to print the lists.
         for i in range(max_length):
 
-            output += "\n " + advantages[i] + "  " + flaws[i]
+            output += "\n " + advantages[i] + "  " + flaws[i] + "  " + pools[i]
         if max_length > 0:
             self.caller.msg(output)
 
@@ -866,9 +880,17 @@ class CmdPose(MuxCommand):
             msg = "What do you want to do?"
             self.caller.msg(msg)
         else:
-            msg = f"{self.caller.db.moniker or self.caller.name}{self.args}"
-            self.caller.location.msg_contents(
-                text=(msg, {"type": "pose"}), from_obj=self.caller)
+            # send an indivtual message to every listening object in the location.
+            # We need to use self.caller.get_display_name(looker) to get the name but we
+            # need the looker object first.
+
+            # get all of the objects in the location
+            lookers = self.caller.location.contents
+            # loop through the list of objects
+            for looker in lookers:
+                # send the message to the object
+                looker.msg(
+                    f"{self.caller.get_display_name(looker)}{self.args}")
 
 
 class CmdEmit(MuxCommand):
