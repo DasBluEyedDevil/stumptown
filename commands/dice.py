@@ -173,7 +173,7 @@ class dice(MuxCommand):
         if mod_dice_pool <= 0:
             hunger = hunger + mod_dice_pool
 
-        regular_dice = self.results(+ mod_dice_pool)
+        regular_dice = self.results(mod_dice_pool)
         hunger_dice = self.results(hunger)
 
         succs = regular_dice.get("count") + hunger_dice.get("count") + \

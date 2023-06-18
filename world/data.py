@@ -581,46 +581,46 @@ DISCIPLINES_GOOD_VALUES = {
         "specialties": {
             "heightened senses": {
                 "values": [1],
-                "check": lambda x: x["auspex"] >= 1,
+                "check": lambda x: x.disciplines["auspex"] >= 1,
                 "check_message": "Auspex 1 is required."
             },
             "sense the unseen": {
                 "values": [1],
-                "check": lambda x: x["auspex"] >= 1,
+                "check": lambda x: x.disciplines["auspex"] >= 1,
                 "check_message": "Auspex 1 is required."
             },
             "premonition": {
                 "values": [2],
-                "check": lambda x: x["auspex"] >= 2,
+                "check": lambda x: x.disciplines["auspex"] >= 2,
                 "check_message": "Auspex 2 is required."
             },
             "scry the soul": {
                 "values": [3],
-                "check": lambda x: x["auspex"] >= 3,
+                "check": lambda x: x.disciplines["auspex"] >= 3,
                 "check_message": "Auspex 3 is required."
             },
             "shared senses": {
-                "values": [3], "check": lambda x: x["auspex"] >= 3,
+                "values": [3], "check": lambda x: x.disciplines["auspex"] >= 3,
                 "check_message": "Auspex 3 is required."
             },
             "spirits touch": {
                 "values": [4],
-                "check": lambda x: x["auspex"] >= 4,
+                "check": lambda x: x.disciplines["auspex"] >= 4,
                 "check_message": "Auspex 4 is required."
             },
             "clairvoyance": {
                 "values": [5],
-                "check": lambda x: x["auspex"] >= 5,
+                "check": lambda x: x.disciplines["auspex"] >= 5,
                 "check_message": "Auspex 5 is required."
             },
             "possession": {
                 "values": [5],
-                "check": lambda x: x["auspex"] >= 5 and x["dominate"] >= 3,
+                "check": lambda x: x.disciplines["auspex"] >= 5 and x["dominate"] >= 3,
                 "check_message": "Auspex 5 and Dominate 3 are required."
             },
             "telepathy": {
                 "values": [5],
-                "check": lambda x: x["auspex"] >= 5,
+                "check": lambda x: x.disciplines["auspex"] >= 5,
                 "check_message": "Auspex 5 is required."
             }
         }
@@ -632,42 +632,42 @@ DISCIPLINES_GOOD_VALUES = {
         "specialties": {
             "cats grace": {
                 "values": [1],
-                "check": lambda x: x["celerity"] >= 1,
+                "check": lambda x: x.disciplines["celerity"] >= 1,
                 "check_message": "Celerity 1 is required."
             },
             "fleetness": {
                 "values": [2],
-                "check": lambda x: x["celerity"] >= 2,
+                "check": lambda x: x.disciplines["celerity"] >= 2,
                 "check_message": "Celerity 2 is required."
             },
             "blink": {
                 "values": [3],
-                "check": lambda x: x["celerity"] >= 3,
+                "check": lambda x: x.disciplines["celerity"] >= 3,
                 "check_message": "Celerity 3 is required."
             },
             "traversal": {
                 "values": [3],
-                "check": lambda x: x["celerity"] >= 3,
+                "check": lambda x: x.disciplines["celerity"] >= 3,
                 "check_message": "Celerity 3 is required."
             },
             "draught of elegance": {
                 "values": [4],
-                "check": lambda x: x["celerity"] >= 4,
+                "check": lambda x: x.disciplines["celerity"] >= 4,
                 "check_message": "Celerity 4 is required."
             },
             "unerring aim": {
                 "values": [4],
-                "check": lambda x: x["celerity"] >= 4 and x["auspex"] >= 2,
+                "check": lambda x: x.disciplines["celerity"] >= 4 and x["auspex"] >= 2,
                 "check_message": "Celerity 4 and Auspex 2 are required."
             },
             "lightning strike": {
                 "values": [5],
-                "check": lambda x: x["celerity"] >= 5,
+                "check": lambda x: x.disciplines["celerity"] >= 5,
                 "check_message": "Celerity 5 is required."
             },
             "split second": {
                 "values": [5],
-                "check": lambda x: x["celerity"] >= 5,
+                "check": lambda x: x.disciplines["celerity"] >= 5,
                 "check_message": "Celerity 5 is required."
             },
         }
