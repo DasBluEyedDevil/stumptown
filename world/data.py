@@ -361,6 +361,10 @@ ADVANTAGES_GOOD_VALUES = {
         "check": lambda x: x["splat"] == "vampire",
         "check_message": "Mask is only available to vampires."
     },
+    "status": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True
+    },
     "zeroed": {
         "values": [1],
         "check": lambda x: x["advantages"]["mask"] == 2,
@@ -707,7 +711,7 @@ POOLS_GOOD_VALUES = {
     "willpower": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]},
     "blood potency": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "check": lambda x: x["splat"] == "vampire"},
     "health": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]},
-    "hunger": {"values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "check": lambda x: x["splat"] == "vampire"},
+    "hunger": {"values": [1, 2, 3, 4, 5], "check": lambda x: x["splat"] == "vampire"},
 }
 
 

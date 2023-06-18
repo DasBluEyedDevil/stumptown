@@ -72,6 +72,10 @@ class dice(MuxCommand):
 
     def func(self):
 
+        if not self.caller.db.stats:
+            self.caller.msg("You don't have any stats yet.")
+            return
+
         try:
             hunger = self.caller.db.stats["pools"]["hunger"]
         except KeyError:
@@ -188,8 +192,10 @@ class dice(MuxCommand):
         else:
             successes = "|g" + str(succs) + "|n" + " successes"
         dice = " ".join(dice).replace(" +", " + ").replace(" -", " - ")
-        if hunger:
-            msg = f"|wROLL>|n |c{self.caller.name}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()}) |w<|n{hunger_dice.get('s_list').strip()}|w>|n"
-        else:
-            msg = f"|wROLL>|n |c{self.caller.name}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()})"
-        self.caller.location.msg_contents(msg)
+
+        for looker in self.caller.location.contents:
+            if hunger:
+                msg = f"|wROLL>|n |c{self.caller.get_display_name(looker)}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()}) |w<|n{hunger_dice.get('s_list').strip()}|w>|n"
+            else:
+                msg = f"|wROLL>|n |c{self.caller.get_display_name(looker)}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()})"
+            looker.msg(msg)

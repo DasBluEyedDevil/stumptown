@@ -836,25 +836,26 @@ class CmdOOC(MuxCommand):
         # If speech is empty, stop here
         if not speech:
             return
-        if speech[0] == ":":
-            speech = speech[1:]
-            speech = (self.caller.db.moniker or self.caller.name) + \
-                " " + speech
-        elif speech[0] == ";":
-            speech = speech[1:]
-            speech = (self.caller.db.moniker or self.caller.name) + speech
-        else:
-            speech = (self.caller.db.moniker or self.caller.name) + \
-                ' says, "' + speech + '"'
-        # If speech is empty, stop here
-        if not speech:
-            return
 
-        # Send to all in current location.
-        if self.caller.db.ooc_style:
-            caller.location.msg_contents(caller.db.ooc_style + " " + speech)
-        else:
-            caller.location.msg_contents("|w<|rOOC|n|w>|n " + speech)
+        for looker in caller.location.contents:
+            if speech[0] == ":":
+                speech = speech[1:]
+                speech = (self.caller.get_display_name(looker)) + \
+                    " " + speech
+            elif speech[0] == ";":
+                speech = speech[1:]
+                speech = (self.caller.get_display_name(looker)) + speech
+            else:
+                speech = (self.caller.get_display_name(looker)) + \
+                    ' says, "' + speech + '"'
+
+            # Send to all in current location.
+            if self.caller.db.ooc_style:
+                ooc = caller.db.ooc_style + " " + speech
+            else:
+                ooc = "|w<|rOOC|n|w>|n " + speech
+
+            looker.msg(ooc)
 
 
 class CmdPose(MuxCommand):
