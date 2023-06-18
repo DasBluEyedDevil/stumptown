@@ -24,7 +24,7 @@ def target(context):
     key = key.split("(")
     if len(key) > 1:
         instance = context.args.split("(")[1]
-        instance = instance.replace(")", "")
+        instance = instance.split(")")[0]
 
     key = key[0]
 
@@ -66,9 +66,23 @@ def columns(col=[], col2=[], col3=[]):
 
 def format(key="", val=0, width=24, just="rjust", type="", temp=0):
     title = "|w" if val else "|x"
-    title += key.capitalize() + ":|n"
     text_val = "|w" if val else "|x"
     text_val += str(val) + "|n"
+    try:
+        parts = key.split("(")
+        parts[1] = parts[1].split(")")[0]
+        parts[0] = " ".join(map(lambda x: x.capitalize(), parts[0].split(" ")))
+        parts[1] = " ".join(map(lambda x: x.capitalize(), parts[1].split(" ")))
+    except:
+        parts = [" ".join(map(lambda x: x.capitalize(), key.split(" "))), ""]
+
+    if (parts[1]) != "":
+        title += f"{parts[0]}({parts[1]})"[:width - 3 -
+                                           len(ANSIString("{}".format(text_val)))] + ":|n"
+    else:
+        title += f"{parts[0]}"[:width - 3 -
+                               len(ANSIString("{}".format(text_val)))] + ":|n"
+
     if temp:
         text_val += f"|w({temp})|n"
     if just == "ljust":

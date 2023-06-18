@@ -26,29 +26,27 @@ from evennia import utils
 
 CONNECTION_SCREEN = """
 
-                       .|        ,       +
-             *         | |      ((             *
-                       |'|       '    ._____
-         +     ___    |  |   *        |.   |' .---"|   
-       _    .-'   '-. |  |     .--'|  |||   | _|    |    
-    .-'|  _.|  |    |||   '-__  |   |  |    |||      |   
-    |' | |.    |    |||       | |   |  |    |||      |    
- ___|  '-'     '    ""      '-'   '-.'    ''      |____
- __  _____  _     _      ___  _____  ___   _       _        
-( ('  | |  | | | | |\/| | ||_)  | |  / / \ \ \    /| |\ | 
-_)_)  ||_|  \_\_/ ||_|  | ||_|    ||_|  \_\_/  \_\/\/ ||_| \| 
+                              .|        ,       +
+                    *         | |      ((             *
+                              |'|       '    ._____
+                +     ___    |  |   *        |.   |' .---"|   
+              _    .-'   '-. |  |     .--'|  |||   | _|    |    
+            .-'|  _.|  |    |||   '-__  |   |  |    |||      |   
+            |' | |.    |    |||       | |   |  |    |||      |    
+        ___|  '-'     '    ""      '-'   '-.'    ''         ||____
+  .dP"Y8 888888 88   88 8b    d8 88""Yb 888888  dP"Yb  Yb        dP 88b 88 
+  `Ybo."   88   88   88 88b  d88 88__dP   88   dP   Yb  Yb  db  dP  88Yb88 
+  o.`Y8b   88   Y8   8P 88YbdP88 88'''    88   Yb   dP   YbdPYbdP   88 Y88 
+  8bodP'   88   `YbodP' 88 YY 88 88       88    YbodP     YP  YP    88  Y8 
 
---------------------------------------------------------------
+  Rose City by Night - A World of Darkness MUSH                                                                                             
 
-      Rose City by Night - A World of Darkness MUSH                                                                                             
-                Powered By Evennia v{}
-    
-    To connect, type '|wconnect <username> <password>|n'
-    to create,  type '|wcreate  <username> <password>|n'
+  To connect, type '|wconnect <username> <password>|n'
+  to create,  type '|wcreate  <username> <password>|n'
 
-If you have spaces in your username, enclose it in quotes.
+  If you have spaces in your username, enclose it in quotes.
               
---------------------------------------------------------------
-              Enter |whelp|n for more info.""".format(
+  Powered By Evennia v{}
+  Enter |whelp|n for more info.""".format(
     utils.get_evennia_version("short")
 )

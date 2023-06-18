@@ -9,7 +9,6 @@ class cmdNotes(MuxCommand):
    +notes                      - see all your notes
    +note <note name or number> - see your note
    +note/<category>            - see all your notes in a category
-   +notedecompile <note(s)>    - get the raw text that created the note.
 
    +note <target>/*            - see all visible notes on someone else
    +note <target>/<note>       - see a note on someone else
@@ -40,16 +39,18 @@ class cmdNotes(MuxCommand):
         """
         Gets the target object from the name.
         """
-        target = self.caller.search(target, global_search=True)
+        tar = self.caller.search(target, global_search=True)
 
         # if no target is found check for me and here.
-        if not target:
-            if target == "me":
-                target = self.caller
-        elif target == "here":
-            target = self.caller.location
+        if not tar:
+            if target.lower() == "me":
+                tar = self.caller
+            elif target.lower() == "here":
+                tar = self.caller.location
+            else:
+                return None
         else:
-            return target
+            return tar
 
     def func(self):
 

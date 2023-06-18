@@ -145,7 +145,20 @@ ADVANTAGES = [
     "unbondable",
     "bloodhound",
     "iron gullet",
-    "eat food"
+    "eat food",
+    "allies",
+    "contacts",
+    "fame",
+    "influence",
+    "haven",
+    "herd",
+    "mask",
+    "zeroed",
+    "cobbler",
+    "mawla",
+    "resources",
+    "retainers",
+    "status"
 ]
 FLAWS = [
     "illiterate",
@@ -165,7 +178,18 @@ FLAWS = [
     "stake bait",
     "bane",
     "folklore block",
-    "stigmata"
+    "stigmata",
+    "dark secret",
+    "dispised",
+    "disliked",
+    "no haven",
+    "known blankbody",
+    "known corpse",
+    "adversary",
+    "destitude",
+    "stalkers",
+    "shunned",
+    "suspect",
 ]
 
 
@@ -301,6 +325,66 @@ ADVANTAGES_GOOD_VALUES = {
         "values": [2],
         "check": lambda x: x["splat"] == "vampire",
         "check_message": "Eat Food is only available to vampires."
+    },
+    "allies": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True
+    },
+    "contacts": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True
+    },
+    "fame": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True
+    },
+    "fame": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True
+    },
+    "haven": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True
+    },
+    "herd": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True,
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Herd is only available to vampires."
+    },
+    "influence": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True
+    }, "mask": {
+        "values": [1, 2],
+        "instanced": True,
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Mask is only available to vampires."
+    },
+    "zeroed": {
+        "values": [1],
+        "check": lambda x: x["advantages"]["mask"] == 2,
+        "check_message": "Zeroed is only available to vampires with Mask 2."
+    },
+    "cobbler": {
+        "values": [1],
+        "check": lambda x: x["advantages"]["mask"] == 2,
+        "check_message": "Cobbler is only available to vampires with Mask 2."
+    },
+    "mawla": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True,
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Mawla is only available to vampires."
+    },
+    "resources": {
+        "values": [1, 2, 3, 4, 5],
+    },
+    "retainer": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True,
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Retainer is only available to vampires."
     }
 }
 
@@ -379,6 +463,55 @@ FLAWS_GOOD_VALUES = {
         "check": lambda x: x["splat"] == "vampire",
         "check_message": "Folklore Block is only available to vampires."
     },
+    "dark secret": {
+        "values": [1, 2],
+        "instanced": True
+    },
+    "despised": {
+        "values": [2],
+        "instnaed": True
+    },
+    "disliked": {
+        "values": [1],
+        "instanced": True
+    },
+    "no haven": {
+        "values": [1],
+    },
+    "obvious predator": {
+        "values": [2],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Obvious Predator is only available to vampires."
+    },
+    "knowwn blankbody": {
+        "values": [2],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Known Blankbody is only available to vampires."
+    },
+    "known corpse": {
+        "values": [1],
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Known Corpse is only available to vampires."
+    },
+    "adverssary": {
+        "values": [1, 2, 3, 4, 5],
+        "instanced": True,
+        "check": lambda x: x["splat"] == "vampire",
+        "check_message": "Adversary is only available to vampires."
+    },
+    "destitute": {
+        "values": [1],
+    },
+    "stalkers": {"values": [1]},
+    "shunned": {
+        "values": [2],
+        "instanced": True
+    },
+    "suspect": {
+        "values": [1],
+        "instanced": True
+    }
+
 }
 
 
@@ -620,6 +753,18 @@ def get_trait_list(string):
                 except:
                     output["has_specialties"] = False
                     output["specialties"] = {}
+
+                try:
+                    output["instanced"] = list[2][trait]["instanced"] if trait in list[
+                        2] else list[2]["default"]["instanced"] if "default" in list[2] else False
+                except:
+                    output["instanced"] = False
+
+                try:
+                    output["instances"] = list[2][trait]["instances"] if trait in list[
+                        2] else list[2]["default"]["instances"] if "default" in list[2] else []
+                except:
+                    output["instances"] = []
 
                 return output
 

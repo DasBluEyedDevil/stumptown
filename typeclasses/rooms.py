@@ -64,16 +64,24 @@ class Room(ObjectParent, DefaultRoom):
                 return time_str.strip()
 
         # Get the description, build the string
-        description = self.db.desc
+        description = "|-" + (self.db.desc or "You see nothing special.")
 
         # build the namestring. This is Name(#id) for admins
         # and Name for all others.
         output = ""
         namestring = self.get_display_name(looker)
 
+        try:
+            if not self.db.ic:
+                ooc = ANSIString("[OOC Area] ")
+            else:
+                ooc = ""
+        except:
+            ooc = ""
+
         # build the return string
-        output += ANSIString("|Y[|n |w%s|n |Y]|n" %
-                             namestring).center(78, ANSIString("|R=|n"))
+        output += ANSIString("|Y[|n |w%s%s|n |Y]|n" %
+                             (ooc, namestring)).center(78, ANSIString("|R=|n"))
         output += "\n\n%s\n\n" % description
         # display the characters in the room.
         characters = [char for char in self.contents if char.has_account]

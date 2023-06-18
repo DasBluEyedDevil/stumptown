@@ -185,16 +185,26 @@ class cmdCg(MuxCommand):
 
         # check for instance
         if instance and traits.get("instanced"):
-            key = "%s(%s)" % (key.capitalize(), instance.capitalize())
+            key = "%s(%s)" % (key.capitalize(),
+                              instance.capitalize().split("=")[0])
 
-        elif instance and not traits.get("instance"):
+        elif instance and not traits.get("instanced"):
             self.caller.msg("|wSTATS>|n That trait does not have instances.")
             return
 
-        elif not instance and traits.get("instance"):
+        elif not instance and traits.get("instanced"):
             self.caller.msg(
-                "|wSTATS>|n You must specify an (instance) for |w%s()|n." % traits.get(key.capitalize()))
+                "|wSTATS>|n You must specify an (instance) for |w%s()|n." % traits.get("trait").upper())
             return
+
+        # if there are instances given and insance isn't oneo of them, then error.
+        if traits.get("instances"):
+            if instance and instance not in traits.get("instances"):
+                self.caller.msg(
+                    "|wSTATS>|n |w%s|n is not a valid instance for |w%s()|n." % (instance, traits.get("trait").upper()))
+                self.caller.msg(
+                    "|wSTATS>|n Valid instances are: |w%s|n." % ", ".join(traits.get("instances")))
+                return
 
         # check for spwcialties [<value>][/<specialty>]
         # to set a specialty, you must set a value and have a value in the key trait first.
@@ -298,10 +308,22 @@ class cmdCg(MuxCommand):
                     "|wSTATS>|n |w%s|n removed from |c%s's|n sheet." % (key.upper(), tar.name))
                 return
 
+        try:
+            self.lhs = int(self.lhs)
+        except ValueError:
+            self.lhs = self.lhs.lower()
+
+        try:
+            display_key = key.upper()
+        except AttributeError:
+            display_key = key
+
         # check for valid values
         if traits["values"] and self.rhs not in traits["values"]:
             self.caller.msg(
-                "|wSTATS>|n That is not a valid value for |w%s|n." % key.upper())
+                "|wSTATS>|n That is not a valid value for |w%s|n." % display_key)
+            self.caller.msg("|wSTATS>|n Valid values are: |w%s|n" % ", ".join(
+                map(lambda x: ANSIString(f"|w{x}|n").capitalize(), traits["values"])))
             return
 
         # set the value
@@ -316,16 +338,18 @@ class cmdCg(MuxCommand):
                 tar.db.stats["temp"][key] = self.rhs
 
             self.caller.msg("|wSTATS>|n |c%s's|n (temp) |w%s|n set to|w %s|n." % (
-                tar.name, key.upper(), self.rhs))
+                tar.name, display_key, self.rhs))
             return
         else:
             try:
-                tar.db.stats[traits.get("category")][key] = int(self.rhs)
-            except ValueError:
+                tar.db.stats[traits.get("category")][key] = self.rhs.lower()
+                display = self.rhs.upper()
+            except AttributeError:
                 tar.db.stats[traits.get("category")][key] = self.rhs
+                display = self.rhs
 
             self.caller.msg("|wSTATS>|n |c%s's|n  |w%s|n set to|w %s|n." %
-                            (tar.name, key.upper(), self.rhs))
+                            (tar.name, display_key, display))
 
 
 class cmdSheet(MuxCommand):
@@ -368,6 +392,10 @@ class cmdSheet(MuxCommand):
             except KeyError:
                 bio.append(ANSIString(
                     format(item, "", width=38, just="ljust")))
+            except AttributeError:
+                val = target.db.stats[traits.get("category")][item]
+                bio.append(ANSIString(
+                    format(item, val, width=38, just="ljust")))
 
         # Noq peint the bio in two columns.
         count = 0
@@ -637,41 +665,34 @@ class cmdSheet(MuxCommand):
         """
         This method shows the advantages of a character.
         """
-        output = ANSIString("|w Advantages |n").center(26, ANSIString("|R=|n"))
-        output += ANSIString("|w Flaws |n").center(26, ANSIString("|R=|n"))
-        output += ANSIString("|w Pools |n").center(26, ANSIString("|R=|n"))
+        output = ANSIString("|w Advantages |n").center(39, ANSIString("|R=|n"))
+        output += ANSIString("|w Flaws |n").center(39, ANSIString("|R=|n"))
 
         # first we build our two lists.
         raw_advantages = target.db.stats["advantages"]
         raw_flaws = target.db.stats["flaws"]
         advantages = []
         flaws = []
-        pools = []
 
         # fill in format entry for advanaages and flaws
         for key, value in raw_advantages.items():
-            advantages.append(format(key, value, width=24))
+            advantages.append(format(key, value, width=37))
         for key, value in raw_flaws.items():
-            flaws.append(format(key, value, width=24))
-        for key, value in target.db.stats["pools"].items():
-            pools.append(format(key, value, width=24))
+            flaws.append(format(key, value, width=37))
 
         # get the max length and pad the end of the list with spaces
-        max_length = max(len(raw_advantages), len(flaws), len(pools))
+        max_length = max(len(raw_advantages), len(flaws))
         if len(raw_advantages) < max_length:
             for i in range(max_length - len(raw_advantages)):
-                advantages.append(" " * 24)
+                advantages.append(" " * 38)
         if len(raw_flaws) < max_length:
             for i in range(max_length - len(raw_flaws)):
-                flaws.append(" " * 24)
-        if len(pools) < max_length:
-            for i in range(max_length - len(pools)):
-                pools.append(" " * 24)
+                flaws.append(" " * 38)
 
         # now we need to print the lists.
         for i in range(max_length):
 
-            output += "\n " + advantages[i] + "  " + flaws[i] + "  " + pools[i]
+            output += "\n " + advantages[i] + "  " + flaws[i]
         if max_length > 0:
             self.caller.msg(output)
 
@@ -686,8 +707,12 @@ class cmdSheet(MuxCommand):
         try:
             # player has to ahve a splat set first!
             if not tar.db.stats["bio"].get("splat"):
-                self.caller.msg(
-                    "|wSTATS>|n |yThey must select a splat before you can view their sheet.|n")
+                if self.caller == tar:
+                    self.caller.msg(
+                        "|wSTATS>|n |yYou must select a splat before you can view your sheet.|n")
+                else:
+                    self.caller.msg(
+                        "|wSTATS>|n |yThey must select a splat before you can view their sheet.|n")
                 return
         except TypeError:
             self.caller.msg(
