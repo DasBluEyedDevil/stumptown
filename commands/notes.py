@@ -191,7 +191,6 @@ class cmdNotes(MuxCommand):
         """
         Shows a single note.
         """
-        self.caller.msg(tar.name)
         # get the note.  If the title is a #<number> or number, then it's the index of the note.
         # else it's the title.
         try:
@@ -200,10 +199,13 @@ class cmdNotes(MuxCommand):
             try:
                 notes = filter(lambda x: x["title"] == title, tar.db.notes)
                 note = next(notes)
-            except (IndexError, TypeError, AttributeError, StopIteration):
+            except (IndexError, TypeError, StopIteration):
                 self.caller.msg("|wNOTES>|n No note found.")
                 return
-
+        except AttributeError:
+            self.caller.msg("|wNOTES>|n No note found.")
+            return
+        
         # if the note is private and the caller isn't the target or an admin, say so.
         if note["private"] == True and tar != self.caller and not self.caller.check_permstring("Immortals"):
             self.caller.msg("|wNOTES>|n No note found.")
