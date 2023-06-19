@@ -199,7 +199,7 @@ class cmdNotes(MuxCommand):
             try:
                 notes = filter(lambda x: x["title"] == title, tar.db.notes)
                 note = next(notes)
-            except IndexError:
+            except (IndexError, StopIteration):
                 self.caller.msg("|wNOTES>|n No note found.")
                 return
         
@@ -298,7 +298,7 @@ class CmdNoteProve(MuxCommand):
         output += ANSIString("|R-|n" * 78) + "\n"
         output += ANSIString(note["text"]) + "\n"
         output += ANSIString("|R=|n" * 78) + "\n"
-        
+
         tar.msg(output)
 
         self.caller.msg("|wNOTES>|n Note |w#%s|n proven to %s." % (self.caller.db.notes.index(note),tar.get_display_name(self.caller)))
