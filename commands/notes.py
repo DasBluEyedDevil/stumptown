@@ -292,7 +292,7 @@ class CmdNoteProve(MuxCommand):
         note = self.caller.db.notes[int(note)]
 
         # Show the note
-        output = ANSIString("|Y[|n Note #%s |Y]|n" % self.caller.db.notes.index(note)).center(78, ANSIString("|R=|n")) + "\n"
+        output = ANSIString("|Y[|n Note #%s on %s |Y]|n" % (self.caller.db.notes.index(note), self.caller.get_display_name(tar))).center(78, ANSIString("|R=|n")) + "\n"
         output += ANSIString(" Note Title:  |c%s|n" % note["title"]) + "\n"
         output += ANSIString(" Private:     |w%s|n" % ("Yes" if note["private"] == True else "No")) + "\n"
         output += ANSIString(" Category:    |w%s|n" % note["category"]) + "\n"
