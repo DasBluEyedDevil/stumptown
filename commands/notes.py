@@ -200,7 +200,7 @@ class cmdNotes(MuxCommand):
             try:
                 notes = filter(lambda x: x["title"] == title, tar.db.notes)
                 note = next(notes)
-            except (IndexError, AttributeError, StopIteration):
+            except (IndexError, TypeError, AttributeError, StopIteration):
                 self.caller.msg("|wNOTES>|n No note found.")
                 return
 
