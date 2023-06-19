@@ -288,9 +288,16 @@ class CmdNoteProve(MuxCommand):
             note = self.args
 
         tar = self.caller.search(tar, global_search=True)
-
-        note = self.caller.db.notes[int(note)]
-
+        try:
+            note = self.caller.db.notes[int(note)]
+        except (ValueError, IndexError):
+            try:
+                notes = filter(lambda x: x["title"] == note, tar.db.notes)
+                note = next(notes)
+            except (IndexError, TypeError, StopIteration):
+                self.caller.msg("|wNOTES>|n No note found.")
+                return
+            
         # Show the note
         output = ANSIString("|Y[|n Note #%s on %s |Y]|n" % (self.caller.db.notes.index(note), self.caller.get_display_name(tar))).center(78, ANSIString("|R=|n")) + "\n"
         output += ANSIString(" Note Title:  |c%s|n" % note["title"]) + "\n"
