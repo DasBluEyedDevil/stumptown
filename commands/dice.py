@@ -175,9 +175,11 @@ class dice(MuxCommand):
 
         regular_dice = self.results(mod_dice_pool)
         hunger_dice = self.results(hunger)
+        # calculate overall crits from regular and tens.
+        crits = regular_dice.get("tens") + hunger_dice.get("tens")
+        crits = int(crits / 2) * 2
 
-        succs = regular_dice.get("count") + hunger_dice.get("count") + \
-            regular_dice.get("crits") + hunger_dice.get("crits")
+        succs = regular_dice.get("count") + hunger_dice.get("count") + crits
         if succs == 0 and hunger_dice.get("ones") > 0:
             successes = "|rBestial Failure!|n"
 
@@ -187,7 +189,7 @@ class dice(MuxCommand):
         elif succs > 0 and hunger_dice.get("ones") > 0:
             successes = "|g" + str(succs) + "|n" + " successes"
 
-        elif regular_dice.get("crits") and hunger_dice.get("crits"):
+        elif crits and hunger_dice.get("tens"):
             successes = "|g" + str(succs) + "|n" + " |rMessy Critical!|n"
         else:
             successes = "|g" + str(succs) + "|n" + " successes"

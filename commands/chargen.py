@@ -69,7 +69,7 @@ class cmdSplat(MuxCommand):
         target.db.stats["bio"] = {"splat": splat.lower()}
 
         self.caller.msg(
-            "|wSPLAT>|n |c{}'s|n splat has set to |w{}|n.".format(target.name, target.db.stats["splat"].upper()))
+            "|wSPLAT>|n |c{}'s|n splat has set to |w{}|n.".format(target.get_display_name(self.caller), target.db.stats["splat"].upper()))
 
 
 class cmdCg(MuxCommand):
@@ -242,7 +242,7 @@ class cmdCg(MuxCommand):
                 pass
 
             # check for a valid value
-            if value not in traits["specialties"][specialty]["values"]:
+            if value.lower() not in traits["specialties"][specialty]["values"]:
                 self.caller.msg(
                     "|wSTATS>|n That is not a valid value for |w%s|n." % (specialty.upper() or key.upper()))
                 self.caller.msg("|wSTATS>|n Valid values are: |w%s|n" % ", ".join(
@@ -349,7 +349,7 @@ class cmdCg(MuxCommand):
                 display = self.rhs
 
             self.caller.msg("|wSTATS>|n |c%s's|n  |w%s|n set to|w %s|n." %
-                            (tar.name, display_key, display))
+                            (tar.get_display_name(self.caller), display_key, display))
 
 
 class cmdSheet(MuxCommand):
@@ -374,7 +374,7 @@ class cmdSheet(MuxCommand):
         """
         # first print the header.
         output = ANSIString(
-            "|Y[|n |wCharacter Sheet|n for: |c{}|n |Y]|n".format(target.name)).center(78, ANSIString("|R=|n"))
+            "|Y[|n |wCharacter Sheet|n for: |c{}|n |Y]|n".format(target.get_display_name(self.caller))).center(78, ANSIString("|R=|n"))
         bio = []
 
         for item in BIO:
@@ -684,10 +684,10 @@ class cmdSheet(MuxCommand):
         max_length = max(len(raw_advantages), len(flaws))
         if len(raw_advantages) < max_length:
             for i in range(max_length - len(raw_advantages)):
-                advantages.append(" " * 38)
+                advantages.append(" " * 37)
         if len(raw_flaws) < max_length:
             for i in range(max_length - len(raw_flaws)):
-                flaws.append(" " * 38)
+                flaws.append(" " * 37)
 
         # now we need to print the lists.
         for i in range(max_length):

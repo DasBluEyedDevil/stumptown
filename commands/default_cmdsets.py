@@ -19,7 +19,7 @@ from commands.chargen import cmdCg, cmdSplat, cmdSheet, CmdShortDesc, CmdMoniker
 from evennia.contrib.game_systems import mail
 from jobs.jobCmdSet import JobCmdSet
 from bbs.CmdSet import CmdSet as CmdBBS
-from .notes import cmdNotes
+from .notes import cmdNotes, CmdNoteApprove, CmdNoteProve
 from .dice import dice
 
 
@@ -52,6 +52,8 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(JobCmdSet())
         self.add(CmdBBS())
         self.add(cmdNotes())
+        self.add(CmdNoteApprove())
+        self.add(CmdNoteProve())
         self.add(dice())
 
 

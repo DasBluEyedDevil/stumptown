@@ -33,7 +33,7 @@ class cmdNotes(MuxCommand):
     key = "+notes"
     aliases = ["+notes", "notes", "+note", "note", "+n", "n"]
     locks = "cmd:all()"
-    help_category = "Character Generation"
+    help_category = "notes"
 
     def get_target(self, target):
         """
@@ -55,11 +55,13 @@ class cmdNotes(MuxCommand):
     def func(self):
 
         # make sure the caller has a notes attribute.
-        if not self.caller.db.notes:
+        try:
+            self.caller.db.notes
+        except AttributeError:
             self.caller.db.notes = {}
 
         # if there's an = in the name, it's editing a note somehow.
-        if self.rhs:
+        if "=" in self.args:
             self.edit_note()
             return
         else:
@@ -78,250 +80,227 @@ class cmdNotes(MuxCommand):
 
         # if there is no note, then it's clearing the note from the system.
         if not note:
-            self.caller.db.notes[category].pop(name)
-            self.caller.msg("Note %s cleared." % name)
+            self.caller.db.notes = filter(lambda x: x["title"] != name, self.caller.db.notes)
+            self.caller.msg("|wNOTES>|n Note |w%s|n cleared." % name.upper())
             return
-
-        if not self.caller.db.notes.get(category):
-            self.caller.db.notes[category] = {}
-
-        self.caller.db.notes[category][name] = {
+        
+        # does the note already exist?  If so, edit it.
+        for n in self.caller.db.notes:
+            if n["title"] == name:
+                n["text"] = note
+                n["approved"] = False
+                n["approved_by"] = None
+                self.caller.msg("|wNOTES>|n Note |w%s|n edited." % name.upper())
+                return    
+        
+        # if the note doesn't exist, create it.
+        self.caller.db.notes.append({
+            "title": name,
+            "category": category,
             "text": note,
             "date": datetime.now(),
-            "private": False,
+            "private": True,
             "approved": False,
             "approved_by": None
-        }
+        })
 
-        self.caller.msg("Note |w%s|n saved." % name)
+        self.caller.msg("|wNOTES>|n Note |w%s|n saved." % name.upper())
         return
 
     def read_note(self):
-        try:
+        """
+        Reads a note or list of notes.
+
+        notes[/category] [target/][<title> or *]
+        """    
+        # Check for a category switch.
+        if self.switches and self.switches[0] in self.caller.db.notes:
             category = self.switches[0]
-        except IndexError:
+        else:
             category = "general"
 
-        name = self.args
-        target = self.caller
+        # Check for a target.
+        try:
+            title, tar  = self.args.split("/")
+            tar = self.caller.search(tar, global_search=True)
+        except ValueError:
+            title = self.args
+            tar = self.caller
 
-        # if there's a / in the name, it's a target.
-        if "/" in name:
+        # If there's no title, then it's a list of notes.
+        if not title:
+            self.list_notes(category, tar)
+            return
+        
+        # if there's a title, then it's a single note.
+        self.single_note(category, title, tar)
+
+    def list_notes(self, category, tar):
+        """
+        Lists all the notes in a category.
+        """
+
+        # Note list example
+        #  #0   This is the title of the note
+        #       This is the text of the note if it's too long then...
+        #
+        #  #1   This is the title of the note
+        #       This is the text of the note if it's too long then...
+
+        if category == "general":
+            # show all notes.
             try:
-                target, name = name.split("/")
-                target = self.get_target(target)
-            except ValueError:
-                target = self.caller
-                name = name
-
-        # if there's no name, it's a list of notes.
-        if not name or name == "*" and target == self.caller:
-            self.list_notes(category)
-            return
-        else:
-            # if there's no name, it's a list of notes.
-            if not name or name == "*" and target != self.caller:
-                self.list_notes_other(category, target)
+                notes = tar.db.notes
+            except AttributeError:
+                self.caller.msg("|wNOTES>|n No notes found.")
                 return
-        # if there's a name, or it's a number it's a specific note.
-        # if there's a number, and the target is the caller it's a specific note.
-        if name.isdigit() and target == self.caller:
-            self.show_note_by_number(category, int(name))
-            return
         else:
-            # if there's a number, and the target is the caller it's a specific note.
-            if name.isdigit() and target != self.caller:
+            # show notes in a category.
+            notes = filter(lambda x: x["category"] == category, self.caller.db.notes)
+        
+        # if there are no notes, say so.
+        if not notes:
+            self.caller.msg("|wNOTES>|n No notes found.")
+            return   
 
-                # builder+ can see notes on other people.
-                if self.caller.check_permstring("builders"):
-                    self.show_note_by_number_other(category, target, int(name))
-                    return
-                else:
-                    self.caller.msg("You can't read other people's notes.")
-                    return
+        # get all of the categories
+        categories = sorted(set([x["category"] for x in tar.db.notes]))       
 
-    def list_notes(self, category):
-        """
-        Lists all the notes in a category.
-        """
-        if self.switches:
-            # if the category doesn't exist, then there are no notes.
-            if not self.caller.db.notes.get(category):
-                self.caller.msg(
-                    "You have no notes in the |w%s|n category." % category.upper())
-                return
-            self.caller.msg(ANSIString("[ |cNotes|n ]").center(
-                78, ANSIString("|w=|n")))
-            # if the category exists, list all the notes.
-            self.caller.msg("Notes in the %s category:" % category)
-            for note in self.caller.db.notes[category]:
-                self.caller.msg(note)
-            return
-        else:
+        # if there are notes, show them.
+        output = ANSIString("|Y[|n Notes for %s |Y]|n" % tar.get_display_name(self.caller)).center(78, ANSIString("|R=|n")) + "\n"
+        for category in categories:
+            output += ANSIString(" %s " % category.upper()).center(78, ANSIString("|R-|n")) + "\n"
+            # filter notes by category
+            filter_notes = filter(lambda x: x["category"] == category, tar.db.notes)
+            # filter out private notes if looker isn't the target or an admin.
+            if tar != self.caller and not self.caller.check_permstring("Immortals"):
+                filter_notes = filter(lambda x: x["private"] == False, filter_notes)
 
-            # if there are no notes, tell the caller.
-            if not self.caller.db.notes:
-                self.caller.msg("You have no notes.")
-                return
-
-            self.caller.msg(ANSIString("[ |cNotes|n ]").center(
-                78, ANSIString("|w=|n")))
-            # if there are notes, list them.
-            for category in self.caller.db.notes:
-                self.caller.msg(ANSIString("[ |w{}|n ]".format(
-                    category)).center(78, "-"))
-                count = 0
-                for note in self.caller.db.notes[category]:
-                    output = "#|w{}|n  |c{}|n".format(count, note.capitalize())
-
-                    if self.caller.db.notes[category][note]["approved"]:
-                        output += " |g *|n"
-
-                    if self.caller.db.notes[category][note]["private"]:
-                        output += " |r<P>|n"
-
-                    self.caller.msg(output)
-                    text = self.caller.db.notes[category][note]["text"]
-                    # If the text is longer than 75 characters, truncate it.
-                    # else just display it.
-                    if len(text) <= 75:
-                        self.caller.msg("    " + text)
+            for note in filter_notes:
+                if note["category"] == category:
+                    output += ANSIString(" %s #%-3s |c%-60s|n" % ( "*" if note["approved"] == True else " ",  notes.index(note), note["title"])) + "\n"
+                    # If it's over 72 charaters, end with ...
+                    if len(note["text"]) > 65:
+                        output += ANSIString("        %s..." % note["text"][:65]) + "\n"
                     else:
-                        self.caller.msg("    " + text[:70] + "...")
-
-                    count += 1
-
-            self.caller.msg(ANSIString("|w=|n" * 78))
-            self.caller.msg(
-                "To read a note, type '|w+note[/<category>] <note>|n'.")
-            return
-
-    def show_note_by_name(self, category, name):
+                        output += ANSIString("        %s" % note["text"]) + "\n"
+        output += ANSIString("|R==|Y[|n * - Approved Note |Y]|n").ljust(78, ANSIString("|R=|n")) + "\n"
+        self.caller.msg(output)
+        return    
+    def single_note(self, category, title, tar):
         """
-        Shows a specific note.
+        Shows a single note.
         """
-        # if the category doesn't exist, then there are no notes.
-        if not self.caller.db.notes.get(category):
-            self.caller.msg("You have no notes in the %s category." % category)
-            return
-
-       # show the note
+        # get the note.  If the title is a #<number> or number, then it's the index of the note.
+        # else it's the title.
         try:
-            self.caller.msg(self.caller.db.notes[category][name])
-        except KeyError:
-            self.caller.msg("I can't find that note.")
+            note = tar.db.notes[int(title)]
+        except (ValueError, IndexError):
+            try:
+                notes = filter(lambda x: x["title"] == title, tar.db.notes)
+                note = next(notes)
+            except IndexError:
+                self.caller.msg("|wNOTES>|n No note found.")
+                return
+        
+
+        # if the note is private and the caller isn't the target or an admin, say so.
+        if note["private"] == True and tar != self.caller and not self.caller.check_permstring("Immortals"):
+            self.caller.msg("|wNOTES>|n No note found.")
+            return
+
+        # if the note is private and the caller is the target or an admin or the note isn't private continue
+        if note["private"] == True and (tar == self.caller or self.caller.check_permstring("Immortals")) or note["private"] == False:
+            output = ANSIString("|Y[|n Note #%s |Y]|n" % tar.db.notes.index(note)).center(78, ANSIString("|R=|n")) + "\n"
+            output += ANSIString(" Note Title:  |c%s|n" % note["title"]) + "\n"
+            output += ANSIString(" Private:     |w%s|n" % ("Yes" if note["private"] == True else "No")) + "\n"
+            output += ANSIString(" Category:    |w%s|n" % note["category"]) + "\n"
+            output += ANSIString(" Approved by: |w%s|n - %s" % (note["approved_by"].get_display_name(self.caller) if note["approved_by"] else "None", note["date"])) + "\n"
+            output += ANSIString("|R-|n" * 78) + "\n"
+            output += ANSIString(note["text"]) + "\n"
+            output += ANSIString("|R=|n" * 78) + "\n"
+            self.caller.msg(output)
+            return
+
+class CmdNoteApprove(MuxCommand):
+    """
+    Approves a note.
+
+    Usage:
+        note/approve [<target>/]note
+
+    Approves a note.  If no target is specified, then it's assumed that the target is the caller.
+    """
+    key = "note/approve"
+    locks = "cmd:perm(Immortals)"
+    help_category = "Notes"
+
+    def func(self):
+        """
+        Approves a note.
+        """
+        try:
+            tar, note = self.args.split("/")
+            tar = self.caller.search(tar, global_search=True)
+        except ValueError:
+            tar = self.caller
+            note = self.args
+
+        try:
+            note = tar.db.notes[int(note)]
+        except (ValueError, IndexError):
+            try:
+                notes = filter(lambda x: x["title"] == note, tar.db.notes)
+                note = next(notes)
+            except IndexError:
+                self.caller.msg("|wNOTES>|n No note found.")
+                return
+
+        note["approved"] = True
+        note["date"] = datetime.now().strftime("%m/%d/%Y")
+        note["approved_by"] = self.caller
+        self.caller.msg("|wNOTES>|n Note approved.")
         return
 
-    def show_note_by_name_other(self, category, target, name):
-        """
-        Shows a specific note.
-        """
-        # if the category doesn't exist, then there are no notes.
-        if not target.db.notes.get(category):
-            if self.caller.check_permstring("builders"):
-                self.caller.msg("%s has no notes in the %s category." %
-                                (target, category))
-            return
+class CmdNoteProve(MuxCommand):
+    """
+    Proves a note.
 
-        # show the note
+    Usage:
+        note/prove [<target>/]note
+
+    Proves a note.  If no target is specified, then it's assumed that the target is the room.
+    """
+    key = "note/prove"
+    locks = "cmd:all()"
+    help_category = "Notes"
+
+    def func(self):
+        """
+        Proves a note.
+        """
         try:
-            self.caller.msg(target.db.notes[category][name])
-        except KeyError:
-            self.caller.msg("I can't find that note.")
-        return
+            tar, note = self.args.split("/")
+        except ValueError:
+            tar = self.caller
+            note = self.args
 
-    def show_note_by_number(self, category, number):
-        """
-        Shows a specific note.
-        """
-        # if the category doesn't exist, then there are no notes.
-        if not self.caller.db.notes.get(category):
-            self.caller.msg("You have no notes in the %s category." % category)
-            return
+        tar = self.caller.search(tar, global_search=True)
 
-        # if the number is out of range, tell the caller.
-        if number > len(self.caller.db.notes[category]):
-            self.caller.msg("There is no note with that number.")
-            return
+        note = self.caller.db.notes[int(note)]
 
-        # show the note by index.  This is a bit of a hack, but it works.
-        # Make a list of the note titles, choose one, and vifew from that name.
-        try:
-            note = list(self.caller.db.notes[category].keys())[number]
-            self.show_note_by_name(category, note)
-        except IndexError:
-            self.caller.msg("I can't find that note.")
+        # Show the note
+        output = ANSIString("|Y[|n Note #%s |Y]|n" % self.caller.db.notes.index(note)).center(78, ANSIString("|R=|n")) + "\n"
+        output += ANSIString(" Note Title:  |c%s|n" % note["title"]) + "\n"
+        output += ANSIString(" Private:     |w%s|n" % ("Yes" if note["private"] == True else "No")) + "\n"
+        output += ANSIString(" Category:    |w%s|n" % note["category"]) + "\n"
+        output += ANSIString(" Approved by: |w%s|n - %s" % (note["approved_by"].get_display_name(self.caller) if note["approved_by"] else "None", note["date"])) + "\n"
+        output += ANSIString("|R-|n" * 78) + "\n"
+        output += ANSIString(note["text"]) + "\n"
+        output += ANSIString("|R=|n" * 78) + "\n"
+        
+        tar.msg(output)
 
-        return
+        self.caller.msg("|wNOTES>|n Note |w#%s|n proven to %s." % (self.caller.db.notes.index(note),tar.get_display_name(self.caller)))
 
-    def show_note_by_number_other(self, category, target, number):
-        """
-        Shows a specific note.
-        """
-        # if the category doesn't exist, then there are no notes.
-        if not target.db.notes.get(category):
-            self.caller.msg(
-                "They have no notes in the %s category." % category)
-            return
-
-        # if the number is out of range, tell the caller.
-        if number > len(target.db.notes[category]):
-            self.caller.msg("There is no note with that number.")
-            return
-
-        # show the note by index.  This is a bit of a hack, but it works.
-        # Make a list of the note titles, choose one, and vifew from that name.
-        try:
-            note = list(target.db.notes[category].keys())[number]
-            self.show_note_by_name_other(category, note, target)
-        except IndexError:
-            self.caller.msg("I can't find that note.")
-
-        return
-
-    def list_notes_other(self, category, target):
-        """
-        Lists all the notes in a category.
-        """
-
-        if not target:
-            self.caller.msg("They have no notes.")
-            return
-
-        # if there are no notes, tell the caller.
-        if not target.db.notes:
-            self.caller.msg("They have no notes.")
-            return
-
-        self.caller.msg(ANSIString("[ |cNotes for {}|n ]".format(target.get_display_name(self.caller))).center(
-            78, ANSIString("|w=|n")))
-        # if there are notes, list them.
-        for category in target.db.notes:
-            self.caller.msg(ANSIString("[ |w{}|n ]".format(
-                category)).center(78, "-"))
-            count = 0
-
-            for note in target.db.notes[category]:
-                output = "#|w{}|n  |c{}|n".format(count, note.capitalize())
-
-                if target.db.notes[category][note]["approved"]:
-                    output += " |g *|n"
-
-                if target.db.notes[category][note]["private"]:
-                    output += " |r<P>|n"
-
-                self.caller.msg(output)
-                text = target.db.notes[category][note]["text"]
-                # If the text is longer than 75 characters, truncate it.
-                # else just display it.
-                if len(text) <= 75:
-                    self.caller.msg("    " + text)
-                else:
-                    self.caller.msg("    " + text[:70] + "...")
-
-                count += 1
-
-        self.caller.msg(ANSIString("|w=|n" * 78))
-        self.caller.msg(
-            "To read a note, type '|w+note[/<category>] [<name>/]<note>|n'.")
         return
