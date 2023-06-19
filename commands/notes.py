@@ -296,7 +296,11 @@ class CmdNoteProve(MuxCommand):
         output += ANSIString(" Note Title:  |c%s|n" % note["title"]) + "\n"
         output += ANSIString(" Private:     |w%s|n" % ("Yes" if note["private"] == True else "No")) + "\n"
         output += ANSIString(" Category:    |w%s|n" % note["category"]) + "\n"
-        output += ANSIString(" Approved by: |w%s|n - %s" % (note["approved_by"].get_display_name(self.caller) if note["approved_by"] else "None", note["date"])) + "\n"
+        #if approved, show the date.
+        if note["approved"] == True:
+            output += ANSIString(" Approved by: |w%s|n - %s" % (note["approved_by"].get_display_name(self.caller) if note["approved_by"] else "None", note["date"])) + "\n"
+        else:
+            output += ANSIString(" Approved by: |w%s|n" % (note["approved_by"].get_display_name(self.caller) if note["approved_by"] else "None")) + "\n"
         output += ANSIString("|R-|n" * 78) + "\n"
         output += ANSIString(note["text"]) + "\n"
         output += ANSIString("|R=|n" * 78) + "\n"
