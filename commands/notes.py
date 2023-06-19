@@ -121,11 +121,11 @@ class cmdNotes(MuxCommand):
 
         # Check for a target.
         try:
-            title, tar  = self.args.split("/")
-            tar = self.caller.search(tar, global_search=True)
+            tar, title  = self.args.split("/")
         except ValueError:
             title = self.args
             tar = self.caller
+        tar = self.get_target(tar)
 
         # If there's no title, then it's a list of notes.
         if not title:
@@ -133,7 +133,7 @@ class cmdNotes(MuxCommand):
             return
         
         # if there's a title, then it's a single note.
-        self.single_note(category, title, tar)
+        self.single_note(title, tar)
 
     def list_notes(self, category, tar):
         """
@@ -187,10 +187,11 @@ class cmdNotes(MuxCommand):
         output += ANSIString("|R==|Y[|n * - Approved Note |Y]|n").ljust(78, ANSIString("|R=|n")) + "\n"
         self.caller.msg(output)
         return    
-    def single_note(self, category, title, tar):
+    def single_note(self, title, tar):
         """
         Shows a single note.
         """
+        self.caller.msg(tar.name)
         # get the note.  If the title is a #<number> or number, then it's the index of the note.
         # else it's the title.
         try:
@@ -199,10 +200,9 @@ class cmdNotes(MuxCommand):
             try:
                 notes = filter(lambda x: x["title"] == title, tar.db.notes)
                 note = next(notes)
-            except (IndexError, StopIteration):
+            except (IndexError, AttributeError, StopIteration):
                 self.caller.msg("|wNOTES>|n No note found.")
                 return
-        
 
         # if the note is private and the caller isn't the target or an admin, say so.
         if note["private"] == True and tar != self.caller and not self.caller.check_permstring("Immortals"):
