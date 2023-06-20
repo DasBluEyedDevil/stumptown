@@ -19,7 +19,7 @@ class CmdJobs(MuxCommand):
 
         # Query the database for jobs.
         jobs = Job.objects.filter(created_by=account, assigned_to=account)
-        
+
         if jobs:
             # Construct a string to display the jobs.
             job_list = "\n".join(
@@ -173,7 +173,7 @@ class CmdJobCheckIn(MuxCommand):
         try:
             job = Job.objects.get(id=self.args)
         except Job.DoesNotExist:
-            self.caller.msg("Job does not exist.")
+            self.caller.msg("|wJOBS>|n Job does not exist.")
             return
 
         # Check in the job
