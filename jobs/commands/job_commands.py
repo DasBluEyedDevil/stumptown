@@ -11,14 +11,15 @@ class CmdJobs(MuxCommand):
         +jobs
     """
     key = "+jobs"
+    help_category = "Jobs"
 
     def func(self):
         # Get the account associated with this command.
         account = AccountDB.objects.get(id=self.caller.id)
 
         # Query the database for jobs.
-        jobs = Job.objects.filter(created_by=account)
-
+        jobs = Job.objects.filter(created_by=account, assigned_to=account)
+        
         if jobs:
             # Construct a string to display the jobs.
             job_list = "\n".join(

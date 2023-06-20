@@ -1,31 +1,29 @@
 from .models import Job, Bucket
-from evennia import Command
 from evennia.commands.default.muxcommand import MuxCommand
 from .models import Bucket
 from evennia.accounts.models import AccountDB
-
+from evennia.utils.ansi import ANSIString
 
 class CmdBucket(MuxCommand):
     """
-    Manage buckets
+    Manage job buckets.
 
     Usage:
       bucket/create <name>=<description>
       bucket/view <name>
       bucket/delete <name>
       bucket/list
-
     """
 
     key = "+bucket"
     locks = "cmd:perm(bucket) or perm(Builder)"
-    aliases = ["buckets", "@buckets", "bucket", "@bucket"]
+    aliases = ["buckets", "bucket"]
     help_category = "Jobs"
 
     def func(self):
         if not self.args or not self.switches:
             self.caller.msg(
-                "Usage: bucket/<create|view|delete> <name>=<description>")
+                "|wJOBS>|n Usage: bucket/<create|view|delete> <name>=<description>")
             return
 
         if "create" in self.switches:
@@ -75,6 +73,7 @@ class CmdJob(MuxCommand):
     Manage jobs
 
     Usage:
+      job <id>
       job/create <bucket>/<title>=<description>
       job/view <id>
       job/update <id>=<new description>
@@ -94,7 +93,7 @@ class CmdJob(MuxCommand):
     def func(self):
         if not self.args or not self.switches:
             self.caller.msg(
-                "Usage: job/<create|view|update|delete> <arguments>")
+                "|wJOBS>|n Usage: job/<create|view|update|delete> <arguments>")
             return
 
         if "create" in self.switches:
@@ -106,14 +105,14 @@ class CmdJob(MuxCommand):
                 description = description.strip()
             except ValueError:
                 self.caller.msg(
-                    "Usage: job/create <bucket>/<title>=<description>")
+                    "|wJOBS>|n Usage: job/create <bucket>/<title>=<description>")
                 return
 
             try:
                 bucket = Bucket.objects.get(name=bucket_title)
             except Bucket.DoesNotExist:
                 self.caller.msg(
-                    f"|yJOBS>|n No bucket named {bucket_title} exists.")
+                    f"|wJOBS>|n No bucket named {bucket_title} exists.")
                 return
 
             account = AccountDB.objects.get(id=self.caller.id)
@@ -123,7 +122,7 @@ class CmdJob(MuxCommand):
                 bucket=bucket,
                 creator=account,
             )
-            self.caller.msg(f"|yJOBS>|n Created job {job.id}: {job.title}")
+            self.caller.msg(f"|wJOBS>|n Created job {job.id}: {job.title}")
 
         elif "view" in self.switches:
             id = self.args.strip()
@@ -134,7 +133,7 @@ class CmdJob(MuxCommand):
                     f"Job {job.id}: {job.title} - {job.description} in bucket {job.bucket.name}")
 
             except Job.DoesNotExist:
-                self.caller.msg(f"|yJOBS>|n No job with ID {id} exists.")
+                self.caller.msg(f"|wJOBS>|n No job with ID {id} exists.")
 
         elif "update" in self.switches:
             try:
@@ -143,7 +142,7 @@ class CmdJob(MuxCommand):
                 new_description = new_description.strip()
             except ValueError:
                 self.caller.msg(
-                    "|yJOBS>|n Usage: job/update <id>=<new description>")
+                    "|wJOBS>|n Usage: job/update <id>=<new description>")
                 return
 
             try:
@@ -151,18 +150,18 @@ class CmdJob(MuxCommand):
                 job.description = new_description
                 job.save()
                 self.caller.msg(
-                    f"|yJOBS>|n Updated job {job.id}: {job.title} - {job.description}")
+                    f"|wJOBS>|n Updated job {job.id}: {job.title} - {job.description}")
             except Job.DoesNotExist:
-                self.caller.msg(f"|yJOBS>|n No job with ID {id} exists.")
+                self.caller.msg(f"|wJOBS>|n No job with ID {id} exists.")
 
         elif "delete" in self.switches:
             id = self.args.strip()
             try:
                 job = Job.objects.get(id=id)
                 job.delete()
-                self.caller.msg(f"|yJOBS>|n Deleted job with ID {id}.")
+                self.caller.msg(f"|wJOBS>|n Deleted job with ID {id}.")
             except Job.DoesNotExist:
-                self.caller.msg(f"|yJOBS>|n No job with ID {id} exists.")
+                self.caller.msg(f"|wJOBS>|n No job with ID {id} exists.")
 
         elif "assign" in self.switches:
             try:
@@ -171,7 +170,7 @@ class CmdJob(MuxCommand):
                 assignee_name = assignee_name.strip()
             except ValueError:
                 self.caller.msg(
-                    "|yJOBS>|n Usage: job/assign <id>=<assignee>")
+                    "|wJOBS>|n Usage: job/assign <id>=<assignee>")
                 return
 
             try:
@@ -180,12 +179,12 @@ class CmdJob(MuxCommand):
                 job.assigned_to = assignee
                 job.save()
                 self.caller.msg(
-                    f"|yJOBS>|n Assigned job {job.id}: {job.title} to {assignee.username}")
+                    f"|wJOBS>|n Assigned job {job.id}: {job.title} to {assignee.username}")
             except Job.DoesNotExist:
-                self.caller.msg(f"|yJOBS>|n No job with ID {id} exists.")
+                self.caller.msg(f"|wJOBS>|n No job with ID {id} exists.")
             except AccountDB.DoesNotExist:
                 self.caller.msg(
-                    f"|yJOBS>|n No player with username {assignee_name} exists.")
+                    f"|wJOBS>|n No player with username {assignee_name} exists.")
 
         elif "claim" in self.switches:
             id = self.args.strip()
@@ -193,14 +192,14 @@ class CmdJob(MuxCommand):
                 job = Job.objects.get(id=id)
                 if job.assigned_to:
                     self.caller.msg(
-                        f"|yJOBS>|n Job {id} is already claimed by {job.assigned_to.username}.")
+                        f"|wJOBS>|n Job {id} is already claimed by {job.assigned_to.username}.")
                 else:
                     job.assigned_to = self.caller
                     job.save()
                     self.caller.msg(
-                        f"|yJOBS>|n You have claimed job {job.id}: {job.title}")
+                        f"|wJOBS>|n You have claimed job {job.id}: {job.title}")
             except Job.DoesNotExist:
-                self.caller.msg(f"|yJOBS>|n No job with ID {id} exists.")
+                self.caller.msg(f"|wJOBS>|n No job with ID {id} exists.")
 
         elif "complete" in self.switches:
             id = self.args.strip()
@@ -208,14 +207,14 @@ class CmdJob(MuxCommand):
                 job = Job.objects.get(id=id)
                 if job.status == 'CLOSED':
                     self.caller.msg(
-                        f"|yJOBS>|n Job {id} is already completed.")
+                        f"|wJOBS>|n Job {id} is already completed.")
                 else:
                     job.status = 'CLOSED'
                     job.save()
                     self.caller.msg(
-                        f"|yJOBS>|n You have completed job {job.id}: {job.title}")
+                        f"|wJOBS>|n You have completed job {job.id}: {job.title}")
             except Job.DoesNotExist:
-                self.caller.msg(f"|yJOBS>|n No job with ID {id} exists.")
+                self.caller.msg(f"|wJOBS>|n No job with ID {id} exists.")
 
         elif "reopen" in self.switches:
             id = self.args.strip()
@@ -223,14 +222,14 @@ class CmdJob(MuxCommand):
                 job = Job.objects.get(id=id)
                 if job.status != 'CLOSED':
                     self.caller.msg(
-                        f"|yJOBS>|n Job {id} is not completed yet.")
+                        f"|wJOBS>|n Job {id} is not completed yet.")
                 else:
                     job.status = 'OPEN'
                     job.save()
                     self.caller.msg(
-                        f"|yJOBS>|n You have reopened job {job.id}: {job.title}")
+                        f"|wJOBS>|n You have reopened job {job.id}: {job.title}")
             except Job.DoesNotExist:
-                self.caller.msg(f"|yJOBS>|n No job with ID {id} exists.")
+                self.caller.msg(f"|wJOBS>|n No job with ID {id} exists.")
 
         elif "assign" in self.switches:
             try:
@@ -238,7 +237,7 @@ class CmdJob(MuxCommand):
                 id = id.strip()
                 account_name = account_name.strip()
             except ValueError:
-                self.caller.msg("|yJOBS>|n Usage: job/assign <id>=<account>")
+                self.caller.msg("|wJOBS>|n Usage: job/assign <id>=<account>")
                 return
 
             try:
@@ -247,9 +246,15 @@ class CmdJob(MuxCommand):
                 job.assigned_to = account
                 job.save()
                 self.caller.msg(
-                    f"|yJOBS>|n You have assigned job {job.id}: {job.title} to {account.username}")
+                    f"|wJOBS>|n You have assigned job {job.id}: {job.title} to {account.username}")
             except Job.DoesNotExist:
-                self.caller.msg(f"|yJOBS>|n No job with ID {id} exists.")
+                self.caller.msg(f"|wJOBS>|n No job with ID {id} exists.")
             except AccountDB.DoesNotExist:
                 self.caller.msg(
-                    f"|yJOBS>|n No account with username {account_name} exists.")
+                    f"|wJOBS>|n No account with username {account_name} exists.")
+        # if there's no flags, and no args, just list all jobs
+        elif not self.switches and not self.args:
+            jobs = Job.objects.all()
+            output = ANSIString("|wJOBS>|n\n").center(78, ANSIString("|R=|n"))
+            output += ANSIString("|CJOB #  Category   Request Title              Started  Handler           Status|n").ljust(78)
+            self.caller.msg(output)

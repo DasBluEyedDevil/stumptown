@@ -1,5 +1,5 @@
 from evennia import CmdSet
-from .commands.bucket_commands import CmdBuckets, CmdBucketInfo, CmdBucketHelp, CmdBucketCreate, CmdBucketDelete, CmdBucketMonitor
+from .commands.bucket_commands import CmdBuckets, CmdBucketInfo, CmdBucketCreate, CmdBucketDelete, CmdBucketMonitor
 from .commands.job_commands import CmdJobs, CmdJobsList, CmdJobView, CmdJobCreate, CmdJobAddComment
 
 
@@ -13,7 +13,6 @@ class JobCmdSet(CmdSet):
     def at_cmdset_creation(self):
         self.add(CmdBuckets())
         self.add(CmdBucketInfo())
-        self.add(CmdBucketHelp())
         self.add(CmdBucketCreate())
         self.add(CmdBucketDelete())
         self.add(CmdBucketMonitor())
