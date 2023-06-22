@@ -378,26 +378,27 @@ class CmdJob(MuxCommand):
         output += "Type |wjob/view <id>|n to view a job."
         self.caller.msg(output)
 
-    def addplayer(self):
+    def job_addplayer(self):
         """
         Add a player to a job.
         """
-        try:
+        account_names = self.rhs.split(",")
+        names = []
 
-            id = self.lhs.strip()
-            account_names = map(lambda x: AccountDB.objects.get(
-                username=x.key.strip()), self.rhs.split(","))
-        except ValueError:
-            self.caller.msg(
-                "|wJOBS>|n Usage: job/addplayer <id>=<account>[,<account>,...]")
-            return
+        for name in account_names:
+            try:
+                account = AccountDB.objects.get(username=name)
+                names.append(account)
+            except AccountDB.DoesNotExist:
+                self.caller.msg(
+                    f"|wJOBS>|n No account with username {name} exists.")
 
         try:
-            job = Job.objects.get(id=id)
-            job.players.add(account_names)
+            job = Job.objects.get(id=int(self.lhs))
+            job.players.add(names)
             job.save()
 
-            for player in account_names:
+            for player in names:
                 player.msg(
                     f"|wJOBS>|n You have been added to job |w#{job.id}|n")
             self.caller.msg(
