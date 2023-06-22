@@ -2,6 +2,7 @@ from evennia.commands.default.muxcommand import MuxCommand
 from world.data import get_trait_list
 import random
 from evennia.utils.ansi import ANSIString
+from jobs.commands.commands import CmdJob
 
 
 class dice(MuxCommand):
@@ -87,9 +88,17 @@ class dice(MuxCommand):
             self.caller.msg("Usage: +roll <dice pool>")
             return
 
+        if "job" in self.switches:
+
+            try:
+                job, roll = self.args.split(" ", 1)
+            except ValueError:
+                self.caller.msg("Usage: +roll/job <id> <dice pool>")
+                return
+
         # Anywhere in the string, when there's a plus sign with a space on each side, replace it with a plus
         # This is to allow for people to type in "+1 +2 +3" or "+1+2+3" and have it work the same way.
-        args = self.args.replace(
+        args = roll.replace(
             "+", " +").replace(" + ", " +").replace("-", " -").replace(" - ", " -").replace("  ", " ").split(" ")
         dice = []
         dice_pool = 0
@@ -195,9 +204,17 @@ class dice(MuxCommand):
             successes = "|g" + str(succs) + "|n" + " successes"
         dice = " ".join(dice).replace(" +", " + ").replace(" -", " - ")
 
-        for looker in self.caller.location.contents:
+        if "job" in self.switches:
+
             if hunger:
-                msg = f"|wROLL>|n |c{self.caller.get_display_name(looker)}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()}) |w<|n{hunger_dice.get('s_list').strip()}|w>|n"
+                msg = f"|wROLL>|n |c{self.caller.get_display_name()}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()}) |w<|n{hunger_dice.get('s_list').strip()}|w>|n"
             else:
-                msg = f"|wROLL>|n |c{self.caller.get_display_name(looker)}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()})"
-            looker.msg(msg)
+                msg = f"|wROLL>|n |c{self.caller.get_display_name()}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()})"
+            CmdJob.job_comment(self, job, msg, public=True)
+
+        else:
+            for looker in self.caller.location.contents:
+                if hunger:
+                    msg = f"|wROLL>|n |c{self.caller.get_display_name(looker)}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()}) |w<|n{hunger_dice.get('s_list').strip()}|w>|n"
+                else:
+                    msg = f"|wROLL>|n |c{self.caller.get_display_name(looker)}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()})"

@@ -1,8 +1,6 @@
 from django.db import models
 
 # Create your models here.
-from django.db import models
-from evennia import DefaultAccount
 from evennia.accounts.models import AccountDB
 
 
@@ -58,6 +56,8 @@ class Job(models.Model):
     deadline = models.DateTimeField(null=True)
     resolved_at = models.DateTimeField(null=True)
     tags = models.ManyToManyField('Tag')
+    players = models.ManyToManyField(
+        AccountDB, null=True, related_name='related_jobs')
 
 
 class Comment(models.Model):
@@ -69,6 +69,7 @@ class Comment(models.Model):
                             on_delete=models.CASCADE)
     author = models.ForeignKey(
         AccountDB, related_name='comments', on_delete=models.CASCADE)
+    public = models.BooleanField(default=False)
 
 
 class Tag(models.Model):
