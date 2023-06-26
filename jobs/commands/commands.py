@@ -145,34 +145,7 @@ class CmdJob(MuxCommand):
             return
 
         if "create" in self.switches:
-            try:
-                bucket_title, rest = self.args.split("/")
-                title, description = rest.split("=")
-                bucket_title = bucket_title.strip()
-                title = title.strip()
-                description = description.strip()
-            except ValueError:
-                self.caller.msg(
-                    "|wJOBS>|n Usage: job/create <bucket>/<title>=<description>")
-                return
-
-            try:
-                bucket = Bucket.objects.get(name=bucket_title)
-            except Bucket.DoesNotExist:
-                self.caller.msg(
-                    f"|wJOBS>|n No bucket named {bucket_title} exists.")
-                return
-
-            account = AccountDB.objects.get(id=self.caller.id)
-            job = Job.objects.create(
-                bucket=bucket,
-                title=title,
-                description=description,
-                created_by=account,
-                creator=account,
-            )
-
-            self.caller.msg(f"|wJOBS>|n Created job {job.id}: {job.title}")
+            self.create_job()
 
         elif "addplayer" in self.switches:
             self.job_addplayer()
@@ -347,6 +320,44 @@ class CmdJob(MuxCommand):
         except (Job.DoesNotExist):
             self.caller.msg(f"|wJOBS>|n No job with ID {id} exists.")
 
+    def create_job(self, bucket_title="", title="", description="", created_by=None):
+        """
+        Create a new job.
+        """
+        try:
+
+            lhsparts = self.lhs.split("/")
+            bucket_title = bucket_title or lhsparts[0]
+            title = title or lhsparts[1]
+            description = description or self.rhs
+            created_by = created_by or self.caller
+        except ValueError:
+            self.caller.msg(
+                "|wJOBS>|n Usage: job/create <bucket>/<title>=<description>")
+            return
+
+        try:
+            bucket = Bucket.objects.get(name=bucket_title)
+        except Bucket.DoesNotExist:
+            self.caller.msg(
+                f"|wJOBS>|n No bucket named |w{bucket_title}|n exists.")
+            return
+
+        account = AccountDB.objects.get(id=created_by.id)
+        job = Job.objects.create(
+            bucket=bucket,
+            title=title,
+            description=description,
+            created_by=account,
+            creator=account
+        )
+        for acct in AccountDB.objects.all():
+            if self.caller.check_permstring("builders"):
+                acct.msg(
+                    f"|wJOBS>|n New job |w#{job.id}|n created by {account.name}: {job.title}")
+                acct.msg(
+                    f"|wJOBS>|n Use |wjob/view {job.id}|n to view the job.")
+
     def list_jobs(self):
         """
         List all jobs.
@@ -382,29 +393,13 @@ class CmdJob(MuxCommand):
         """
         Add a player to a job.
         """
-        account_names = self.rhs.split(",")
-        names = []
+        pass
 
-        for name in account_names:
-            try:
-                account = AccountDB.objects.get(username=name)
-                names.append(account)
-            except AccountDB.DoesNotExist:
-                self.caller.msg(
-                    f"|wJOBS>|n No account with username {name} exists.")
-
-        try:
-            job = Job.objects.get(id=int(self.lhs))
-            job.players.add(names)
-            job.save()
-
-            for player in names:
-                player.msg(
-                    f"|wJOBS>|n You have been added to job |w#{job.id}|n")
-            self.caller.msg(
-                f"|wJOBS>|n You have added {', '.join([player.get_display_name(self.caller) for player in account_names])} to job |w#{job.id}|n")
-        except Job.DoesNotExist:
-            self.caller.msg(f"|wJOBS>|n No job with ID {id} exists.")
+    def job_removeplayer(self):
+        """
+        Remove a player from a job.
+        """
+        pass
 
     def job_comment(self, id=None, note=None, public=False, caller=None):
         """

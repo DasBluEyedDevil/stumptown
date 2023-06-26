@@ -138,6 +138,11 @@ class cmdCg(MuxCommand):
             self.caller.msg("|wSTATS>|n Usage: +stat <trait>=<value>")
             return
 
+        if not self.rhs and "+" in self.lhs or "-" in self.lhs:
+            # this is an add or subtract shortcut.  first we need to prep the + or -.
+            args = self.lhs.replace(" + ", " +").replace(" - ", " -")
+            self.lhs, self.rhs = args.split(" ", 1)
+
         # check for a target
         tar = target(self).get("target")
         key = target(self).get("key")
@@ -170,10 +175,24 @@ class cmdCg(MuxCommand):
 
         # check for good values
         try:
-            self.rhs = int(self.rhs)
-        except ValueError:
-            pass
-        except TypeError:
+            if value and value[0] == "+" or value[0] == "-":
+                try:
+                    self.rhs = int(tar.db.stats[traits.get(
+                        "category")][traits.get("trait")]) + int(value)
+                    self.caller.msg(value)
+                except ValueError:
+                    self.caller.msg(
+                        "|wSTATS>|n You must specify a number to add or subtract.")
+                    return
+
+            else:
+                try:
+                    self.rhs = int(self.rhs)
+                except ValueError:
+                    pass
+                except TypeError:
+                    pass
+        except IndexError:
             pass
 
         # check to see if we pass the check

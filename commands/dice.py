@@ -95,6 +95,8 @@ class dice(MuxCommand):
             except ValueError:
                 self.caller.msg("Usage: +roll/job <id> <dice pool>")
                 return
+        else:
+            roll = self.args
 
         # Anywhere in the string, when there's a plus sign with a space on each side, replace it with a plus
         # This is to allow for people to type in "+1 +2 +3" or "+1+2+3" and have it work the same way.
@@ -218,3 +220,4 @@ class dice(MuxCommand):
                     msg = f"|wROLL>|n |c{self.caller.get_display_name(looker)}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()}) |w<|n{hunger_dice.get('s_list').strip()}|w>|n"
                 else:
                     msg = f"|wROLL>|n |c{self.caller.get_display_name(looker)}|n rolls |w{dice}|n -> {successes} ({regular_dice.get('s_list').strip()})"
+                looker.msg(msg)
