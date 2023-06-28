@@ -21,6 +21,8 @@ STATS = {
     "flaws": {},
     "bio": {},
     "splat": "",
+    "notes": "",
+    "approved_by": "",
     "approved": False
 }
 
@@ -134,7 +136,12 @@ SKILLS = [
 DISCIPLINES = [
     "animalism",
     "auspex",
-    "celerity"
+    "celerity",
+    "dominate",
+    "fortitude",
+    "obfuscate",
+    "potence",
+    "presence",
 ]
 ADVANTAGES = [
     "beautiful",
@@ -672,37 +679,268 @@ DISCIPLINES_GOOD_VALUES = {
             },
         }
     },
-    "default": {
-        "values": [],
-        "check": lambda x: x["splat"] in "vampire",
-        "check_message": "Permission Denied",
-        "instanced": False,
-        "instances": [],
-        "has_specialties": False,
-        "specialties": {}
+    "dominate": {
+        "values": range(1, 6),
+        "has_specialties": True,
+        "check_message": "Dominate is only available to vampires.",
+        "specialties": {
+            "cloud memory": {
+                "values": [1],
+                "check": lambda x: x.disciplines["dominate"] >= 1,
+                "check_message": "Dominate 1 is required."
+            },
+            "compel": {
+                "values": [1],
+                "check": lambda x: x.disciplines["dominate"] >= 1,
+                "check_message": "Dominate 1 is required."
+            },
+            "mesmerize": {
+                "values": [2],
+                "check": lambda x: x.disciplines["dominate"] >= 2,
+                "check_message": "Dominate 2 is required."
+            },
+            "dementation": {
+                "values": [2],
+                "check": lambda x: x.disciplines["dominate"] >= 2 and x["obfuscate"] >= 2,
+                "check_message": "Dominate 2 and Obfuscate 2 are required."
+            },
+            "submerged directive": {
+                "values": [2],
+                "check": lambda x: x.disciplines["dominate"] >= 2,
+                "check_message": "Dominate 2 is required."
+            },
+            "the forgetful mind": {
+                "values": [3],
+                "check": lambda x: x.disciplines["dominate"] >= 3,
+                "check_message": "Dominate 3 is required."
+            },
+            "rationalize": {
+                "values": [4],
+                "check": lambda x: x.disciplines["dominate"] >= 4,
+                "check_message": "Dominate 4 is required."
+            },
+            "mass manipulation": {
+                "values": [5],
+                "check": lambda x: x.disciplines["dominate"] >= 5,
+                "check_message": "Dominate 5 is required."
+            },
+            "terminal decree": {
+                "values": [5],
+                "check": lambda x: x.disciplines["dominate"] >= 5,
+                "check_message": "Dominate 5 is required."
+            },
+        },
+    },
+
+    "fortitude": {
+        "values": range(1, 6),
+        "has_specialties": True,
+        "check_message": "Fortitude is only available to vampires.",
+        "specialties": {
+            "resilience": {
+                "values": [1],
+                "check": lambda x: x.disciplines["fortitude"] >= 1,
+                "check_message": "Fortitude 1 is required."
+            },
+            "unswayable mind": {
+                "values": [1],
+                "check": lambda x: x.disciplines["fortitude"] >= 1,
+                "check_message": "Fortitude 1 is required."
+            }
+        },
+        "toughness": {
+            "values": [2],
+            "check": lambda x: x.disciplines["fortitude"] >= 2,
+            "check_message": "Fortitude 2 is required."
+        },
+        "enduuring Bbest": {
+            "values": [2],
+            "check": lambda x: x.disciplines["fortitude"] >= 2,
+            "check_message": "Fortitude 2 is required."
+        },
+        "fortify the inner facade": {
+            "values": [3],
+            "check": lambda x: x.disciplines["fortitude"] >= 3,
+            "check_message": "Fortitude 3 is required."
+        },
+        "draught of endurance": {
+            "values": [4],
+            "check": lambda x: x.disciplines["fortitude"] >= 3,
+            "check_message": "Fortitude 4 is required."
+        },
+        "flesh of marble": {
+            "values": [5],
+            "check": lambda x: x.disciplines["fortitude"] >= 5,
+            "check_message": "Fortitude 5 is required."
+        },
+        "prowess from pain": {
+            "values": [5],
+            "check": lambda x: x.disciplines["fortitude"] >= 5,
+            "check_message": "Fortitude 5 is required."
+        },
+    },
+
+    "obfuscate": {
+        "values": range(1, 6),
+        "has_specialties": True,
+        "check_message": "Obfuscate is only available to vampires.",
+        "specialties": {
+            "cloak of shadows": {
+                "values": [1],
+                "check": lambda x: x.disciplines["obfuscate"] >= 1,
+                "check_message": "Obfuscate 1 is required."
+            }
+        },
+        "unseen passage": {
+            "values": [2],
+            "check": lambda x: x.disciplines["obfuscate"] >= 2,
+            "check_message": "Obfuscate 2 is required."
+        },
+        "ghost in the mahine": {
+            "values": [3],
+            "check": lambda x: x.disciplines["obfuscate"] >= 3,
+            "check_message": "Obfuscate 3 is required."
+        },
+        "mask of a thousand faces": {
+            "values": [4],
+            "check": lambda x: x.disciplines["obfuscate"] >= 4,
+            "check_message": "Obfuscate 4 is required."
+        },
+
+        "conseal": {
+            "values": [4],
+            "check": lambda x: x.disciplines["obfuscate"] >= 4,
+            "check_message": "Obfuscate 4 is required."
+        },
+        "vaniah": {
+            "values": [5],
+            # make sure they ahve the right disciplone level AND stat category in tests?
+            "check": lambda x: x.disciplines["obfuscate"] >= 4 and x.specialties["cloak of shadows"] >= 4,
+            "check_message": "Obfuscate 4 and Cloak of Shadows 4 are required."
+
+        },
+        "imposters guise": {
+            "values": [5],
+            "check": lambda x: x.disciplines["obfuscate"] >= 5 and x.specialties["mask of a thousand faces"] >= 4,
+            "check_message": "Obfuscate 5 and Mask of a Thousand Faces 4 are required."
+        },
+
+    },
+    "potence": {
+        "values": range(1, 6),
+        "has_specialties": True,
+        "check_message": "Potence is only available to vampires.",
+        "specialties": {
+            "lethhal body": {
+                "values": [1],
+                "check": lambda x: x.disciplines["potence"] >= 1,
+                "check_message": "Potence 1 is required."
+            },
+            "soaring leap": {
+                "values": [1],
+                "check": lambda x: x.disciplines["potence"] >= 1,
+                "check_message": "Potence 1 is required."
+            },
+            "prowess": {
+                "values": [2],
+                "check": lambda x: x.disciplines["potence"] >= 2,
+                "check_message": "Potence 2 is required."
+            },
+            "brutal feed": {
+                "values": [3],
+                "check": lambda x: x.disciplines["potence"] >= 3,
+                "check_message": "Potence 3 is required."
+            },
+            "spark of rage": {
+                "values": [3],
+                "check": lambda x: x.disciplines["potence"] >= 3,
+                "check_message": "Potence 3 is required."
+            },
+            "uncanny grip": {
+                "values": [3],
+                "check": lambda x: x.disciplines["potence"] >= 3,
+            },
+            "draught of might": {
+                "values": [4],
+                "check": lambda x: x.disciplines["potence"] >= 4,
+                "check_message": "Potence 4 is required."
+            },
+            "earth shock": {
+                "values": [4],
+                "check": lambda x: x.disciplines["potence"] >= 4,
+                "check_message": "Potence 4 is required."
+            },
+            "fist of caine": {
+                "values": [5],
+                "check": lambda x: x.disciplines["potence"] >= 5,
+                "check_message": "Potence 5 is required."
+            }
+        },
+    },
+    "presence": {
+        "values": range(1, 6),
+        "has_specialties": True,
+        "check_message": "Presence is only available to vampires.",
+        "specialties": {
+            "awe": {
+                "values": [1],
+                "check": lambda x: x.disciplines["presence"] >= 1,
+                "check_message": "Presence 1 is required."
+            },
+            "daunt": {
+                "values": [1],
+                "check": lambda x: x.disciplines["presence"] >= 1,
+                "check_message": "Presence 1 is required."
+            },
+            "lingering kiss": {
+                "values": [2],
+                "check": lambda x: x.disciplines["presence"] >= 2,
+                "check_message": "Presence 2 is required."
+            },
+            "dread gaze": {
+                "values": [3],
+                "check": lambda x: x.disciplines["presence"] >= 3,
+                "check_message": "Presence 3 is required."
+            },
+            "entrancement": {
+                "values": [3],
+                "check": lambda x: x.disciplines["presence"] >= 3,
+                "check_message": "Presence 3 is required."
+            },
+            "irresistable voice": {
+                "values": [4],
+                "check": lambda x: x.disciplines["presence"] >= 4,
+                "check_message": "Presence 4 is required."
+            },
+
+            "summon": {
+                "values": [4],
+                "check": lambda x: x.disciplines["presence"] >= 4,
+                "check_message": "Presence 4 is required."
+            },
+            "majesty": {
+                "values": [5],
+                "check": lambda x: x.disciplines["presence"] >= 5,
+                "check_message": "Presence 5 is required."
+            },
+            "star magnetism": {
+                "values": [5],
+                "check": lambda x: x.disciplines["presence"] >= 5,
+                "check_message": "Presence 5 is required."
+            },
+        },
+        "default": {
+            "values": [],
+            "check": lambda x: x["splat"] in "vampire",
+            "check_message": "Permission Denied",
+            "instanced": False,
+            "instances": [],
+            "has_specialties": False,
+            "specialties": {}
+        }
     }
+
 }
-
-
-# "dominate": {
-#     "cloud memory": {"value": 1, "check": lambda x: x["dominate"] >= 1},
-#     "compel": {"value": 1, "check": lambda x: x["dominate"] >= 1},
-#     "mesmerize": {"value": 2, "check": lambda x: x["dominate"] >= 2},
-#     "dementation": {"value": 2, "check": lambda x: x["dominate"] >= 2 and x["obfuscate"] >= 2},
-#     "the forgetful mind": {"value": 3, "check": lambda x: x["dominate"] >= 3},
-#     "submerged directive": {"value": 3, "check": lambda x: x["dominate"] >= 3},
-#     "rationalize": {"value": 4, "check": lambda x: x["dominate"] >= 4},
-#     "mass manipulation": {"value": 5, "check": lambda x: x["dominate"] >= 5},
-#     "terminal decree": {"value": 5, "check": lambda x: x["dominate"] >= 5},
-# },
-# "fortitude": {},
-# "obfuscate": {},
-# "obtenebration": {},
-# "potence": {},
-# "presence": {},
-# "protean": {},
-# "blood sorcery": {},
-# "thin-blood rituals": {}
 
 
 POOLS_GOOD_VALUES = {

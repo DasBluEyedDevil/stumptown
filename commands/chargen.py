@@ -261,29 +261,58 @@ class cmdCg(MuxCommand):
                 pass
 
             # check for a valid value
-            if value.lower() not in traits["specialties"][specialty]["values"]:
-                self.caller.msg(
-                    "|wSTATS>|n That is not a valid value for |w%s|n." % (specialty.upper() or key.upper()))
-                self.caller.msg("|wSTATS>|n Valid values are: |w%s|n" % ", ".join(
-                    map(lambda x: ANSIString(f"|w{x}|n"), traits["specialties"][specialty]["values"])))
-
-                return
-            else:
-                print(tar.db.stats[traits.get("category")].get(key))
-                # set the  character's trait  if the trait exists
-                if tar.db.stats[traits.get("category")].get(key):
-                    # update the specialties dictionary entry for the specialty under the key.
-                    try:
-                        tar.db.stats["specialties"][key][specialty] = value
-                    except KeyError:
-                        tar.db.stats["specialties"][key] = {specialty: value}
-                    except AttributeError:
-                        tar.db.stats["specialties"] = {key: {specialty: value}}
-
+            try:
+                if value.lower() not in traits["specialties"][specialty]["values"]:
                     self.caller.msg(
-                        "|wSTATS>|n Specialty |w%s|n set on |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
+                        "|wSTATS>|n That is not a valid value for |w%s|n." % (specialty.upper() or key.upper()))
+                    self.caller.msg("|wSTATS>|n Valid values are: |w%s|n" % ", ".join(
+                        map(lambda x: ANSIString(f"|w{x}|n"), traits["specialties"][specialty]["values"])))
 
                     return
+                else:
+                    print(tar.db.stats[traits.get("category")].get(key))
+                    # set the  character's trait  if the trait exists
+                    if tar.db.stats[traits.get("category")].get(key):
+                        # update the specialties dictionary entry for the specialty under the key.
+                        try:
+                            tar.db.stats["specialties"][key][specialty] = value
+                        except KeyError:
+                            tar.db.stats["specialties"][key] = {
+                                specialty: value}
+                        except AttributeError:
+                            tar.db.stats["specialties"] = {
+                                key: {specialty: value}}
+
+                        self.caller.msg(
+                            "|wSTATS>|n Specialty |w%s|n set on |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
+
+                        return
+            except AttributeError:
+                if value not in traits["specialties"][specialty]["values"]:
+                    self.caller.msg(
+                        "|wSTATS>|n That is not a valid value for |w%s|n." % (specialty.upper() or key.upper()))
+                    self.caller.msg("|wSTATS>|n Valid values are: |w%s|n" % ", ".join(
+                        map(lambda x: ANSIString(f"|w{x}|n"), traits["specialties"][specialty]["values"])))
+
+                    return
+                else:
+                    print(tar.db.stats[traits.get("category")].get(key))
+                    # set the  character's trait  if the trait exists
+                    if tar.db.stats[traits.get("category")].get(key):
+                        # update the specialties dictionary entry for the specialty under the key.
+                        try:
+                            tar.db.stats["specialties"][key][specialty] = value
+                        except KeyError:
+                            tar.db.stats["specialties"][key] = {
+                                specialty: value}
+                        except AttributeError:
+                            tar.db.stats["specialties"] = {
+                                key: {specialty: value}}
+
+                        self.caller.msg(
+                            "|wSTATS>|n Specialty |w%s|n set on |c%s's|n |w%s|n." % (specialty, tar.name, key.upper()))
+
+                        return
         # end specialties
 
         # check for a valid value
@@ -1017,3 +1046,29 @@ class CmdEmit(MuxCommand):
                     obj.msg_contents(message)
             else:
                 caller.msg(f"You are not allowed to emit to {objname}.")
+
+
+class cmdSubmit(MuxCommand):
+    """
+    Submit a charaxter applixation!
+
+    Usage:
+      submit
+    """
+
+    key = "submit"
+    locks = "cmd:all()"
+    help_category = "General"
+
+    def func(self):
+        """Submit the application"""
+        caller = self.caller
+        args = self.args
+
+        if caller.db.submitted:
+            caller.msg("|wSTATS>|n You have already submitted an application.")
+            return
+
+        if caller.db.stats["approved"]:
+            caller.msg("|wSTATS>|n You have already been approved.")
+            return
