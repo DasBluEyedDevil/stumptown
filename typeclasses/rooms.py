@@ -119,9 +119,16 @@ class Room(ObjectParent, DefaultRoom):
                     output += "\n%s" % charstring
 
         # display the exits  in the room if there are any
-        exits = [exit for exit in self.contents if exit.destination and not exit.db.exit_location]
-        locations = [exit for exit in self.contents if exit.db.exit_location == True and exit.destination]
-        
+        exits = [
+            exit.get_display_name(looker) for exit in self.contents if exit.destination and not exit.db.exit_location]
+        exits = sorted(exits, key=lambda x: x)
+
+        # exits = list(map(lambda x: x.get_display_name(looker), exits)).sort()
+
+        locations = [
+            exit.get_display_name(looker) for exit in self.contents if exit.db.exit_location == True and exit.destination]
+        locations = sorted(locations, key=lambda x: x)
+
         if locations:
             output += "\n" + \
                 ANSIString(" |wLocations|n ").center(78, ANSIString("|R-|n"))
@@ -131,8 +138,7 @@ class Room(ObjectParent, DefaultRoom):
                     output += "\n "
                 count += 1
 
-                output += ANSIString("%s  " %
-                                     location.get_display_name(looker)).ljust(25)
+                output += ANSIString("%s  " % location).ljust(25)
         if exits:
             output += "\n" + \
                 ANSIString(" |wExits|n ").center(78, ANSIString("|R-|n"))
@@ -142,8 +148,7 @@ class Room(ObjectParent, DefaultRoom):
                     output += "\n "
                 count += 1
 
-                output += ANSIString("%s  " %
-                                     exit.get_display_name(looker)).ljust(25)
+                output += ANSIString("%s  " % exit).ljust(25)
             output += "\n" + ANSIString("|R=|n" * 78)
         else:
             output += "\n" + ANSIString("|R=|n" * 78)
