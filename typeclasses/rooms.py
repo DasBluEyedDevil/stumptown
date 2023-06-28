@@ -119,7 +119,20 @@ class Room(ObjectParent, DefaultRoom):
                     output += "\n%s" % charstring
 
         # display the exits  in the room if there are any
-        exits = [exit for exit in self.contents if exit.destination]
+        exits = [exit for exit in self.contents if exit.destination and not exit.db.exit_location]
+        locations = [exit for exit in self.contents if exit.db.exit_location == True and exit.destination]
+        
+        if locations:
+            output += "\n" + \
+                ANSIString(" |wLocations|n ").center(78, ANSIString("|R-|n"))
+            count = 0
+            for location in locations:
+                if count % 3 == 0:
+                    output += "\n "
+                count += 1
+
+                output += ANSIString("%s  " %
+                                     location.get_display_name(looker)).ljust(25)
         if exits:
             output += "\n" + \
                 ANSIString(" |wExits|n ").center(78, ANSIString("|R-|n"))

@@ -7,6 +7,7 @@ for allowing Characters to traverse the exit to its destination.
 
 """
 from evennia.objects.objects import DefaultExit
+from evennia.utils.ansi import ANSIString
 
 from .objects import ObjectParent
 
@@ -41,6 +42,6 @@ class Exit(ObjectParent, DefaultExit):
 
         # list the first aloias next to the full name of the exit.
         if self.aliases.all():
-            return f"<|w{self.aliases.all()[0].upper()}|n> {self.name}"
+            return ANSIString(f"<|w{self.aliases.all()[0].upper()}|n>").ljust(5) + f"{self.name}"
         else:
             return super().get_display_name(looker, **kwargs)
