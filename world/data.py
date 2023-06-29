@@ -1,4 +1,6 @@
 
+IC = 12
+
 
 STATS = {
     "attributes": {
