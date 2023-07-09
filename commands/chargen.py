@@ -1035,15 +1035,15 @@ class CmdEmit(MuxCommand):
             if not obj:
                 return
             if rooms_only and obj.location is not None:
-                caller.msg(f"{objname} is not a room. Ignored.")
+                caller.msg(ANSIString(f"{objname} is not a room. Ignored."))
                 continue
             if accounts_only and not obj.has_account:
                 caller.msg(f"{objname} has no active account. Ignored.")
                 continue
             if obj.access(caller, "tell"):
-                obj.msg(message)
+                obj.msg(ANSIString(message))
                 if send_to_contents and hasattr(obj, "msg_contents"):
-                    obj.msg_contents(message)
+                    obj.msg_contents(ANSIString(message))
             else:
                 caller.msg(f"You are not allowed to emit to {objname}.")
 
@@ -1072,3 +1072,45 @@ class cmdSubmit(MuxCommand):
         if caller.db.stats["approved"]:
             caller.msg("|wSTATS>|n You have already been approved.")
             return
+
+class CmdApprove(MuxCommand):
+    """
+    Approve a character application.
+
+    Usage:
+      approve <player>
+
+    This will approve the character application of a player.
+    """
+
+    key = "approve"
+    locks = "cmd:perm(Builder)"
+    help_category = "Admin"
+
+    def func(self):
+        """Implement the command"""
+
+        caller = self.caller
+        args = self.args
+
+        if not args:
+            string = "Usage: approve <player>"
+            caller.msg(string)
+            return
+
+        player = caller.search(args, global_search=True)
+        if not player:
+            return
+
+        if not player.db.submitted:
+            caller.msg("That player has not submitted an application.")
+            return
+
+        if player.db.stats["approved"]:
+            caller.msg("That player has already been approved.")
+            return
+
+        player.db.stats["approved"] = True
+        player.db.submitted = False
+        player.msg("|wSTATS>|n Your application has been approved.")
+        caller.msg(f"|wSTATS>|n You have approved {player.key}'s application.")

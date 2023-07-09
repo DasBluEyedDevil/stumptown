@@ -252,9 +252,10 @@ class CmdBBS(default_cmds.MuxCommand):
         "View all posts on a board."
         # ==============================================================================
         #                              **** Announcements ****
-        #       Message                            Posted             By      Comments
+        #       Message                            Posted             By    
         # ------------------------------------------------------------------------------
         # 1     Welcome to the game!               2019-01-01 12:00   Admin          0
+        # 1.1   `RE: Welcome to the game!`         2019-01-01 12:00   Admin          0
         # 2     New rules!                         2019-01-01 12:00   Admin          1
         # 3     Another TItle!                     2019-01-01 12:00   Admin         10
         # =============================================================================
@@ -300,10 +301,6 @@ class CmdBBS(default_cmds.MuxCommand):
         # Date: 2019-01-01 12:00                    Replies: 2 (Locked)
         # ------------------------------------------------------------------------------
         # Welcome to the game! This is a test post.
-        # ------------------------------------------------------------------------------
-        # Replies:
-        # 1. 2019-01-01 12:00 - Admin - This is a test comment.
-        # 2. 2019-01-01 12:00 - Admin - This is another test comment. It's longer t...
         # ==============================================================================
         "Read a post and its comments."
         try:
