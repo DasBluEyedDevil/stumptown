@@ -15,7 +15,8 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 """
 
 from evennia import default_cmds
-from commands.chargen import cmdCg, cmdSplat, cmdSheet, CmdShortDesc, CmdMoniker, CmdOOC, CmdPose, CmdEmit, cmdSubmit
+from commands.chargen import cmdCg, cmdSplat, cmdSheet, CmdShortDesc, CmdMoniker, CmdOOC, CmdPose, CmdEmit, cmdSubmit, CmdApprove
+from commands.rouse import CmdRouse, CmdSlake
 from evennia.contrib.game_systems import mail
 from jobs.jobCmdSet import JobCmdSet
 from bbs.CmdSet import CmdSet as CmdBBS
@@ -51,11 +52,14 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(cmdSubmit())
         self.add(CmdMoniker())
         self.add(JobCmdSet())
+        self.add(CmdApprove())
         self.add(CmdBBS())
         self.add(cmdNotes())
         self.add(CmdNoteApprove())
         self.add(CmdNoteProve())
         self.add(dice())
+        self.add(CmdRouse())
+        self.add(CmdSlake())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
