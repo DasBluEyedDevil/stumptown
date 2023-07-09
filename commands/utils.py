@@ -56,3 +56,22 @@ def is_ic(target):
         return True
     else:
         return False
+
+
+def format(key="", val=0, width=24, just="rjust", type="", temp=0):
+    title = "|w" if val else "|x"
+    title += key.capitalize() + ":|n"
+    text_val = "|w" if val else "|x"
+    text_val += str(val) + "|n"
+    if temp:
+        text_val += f"|w({temp})|n"
+    if just == "ljust":
+        if type == "specialty":
+            return ANSIString(ANSIString(title).ljust(20) + ANSIString("{}".format(str(val)))).ljust(width)[0:width]
+        else:
+            return ANSIString(ANSIString(title).ljust(15) + ANSIString("{}".format(str(val)))).ljust(width)[0:width]
+    else:
+        if type == "specialty":
+            return "  " + ANSIString(ANSIString(title).ljust(width - 2 - len(ANSIString("{}".format(text_val))), ANSIString("|x.|n")) + "{}".format(text_val))
+        else:
+            return ANSIString(ANSIString(title).ljust(width - len(ANSIString("{}".format(text_val))), ANSIString("|x.|n")) + "{}".format(text_val))

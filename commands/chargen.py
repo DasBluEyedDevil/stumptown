@@ -7,6 +7,7 @@ from evennia.commands.default.muxcommand import MuxCommand
 from world.data import BIO, get_trait_list, SPLATS, PHYSICAL, MENTAL, SOCIAL, SKILLS, STATS
 from evennia.utils.ansi import ANSIString
 from .utils import target, format
+from jobs.commands.commands import CmdJob
 
 
 class cmdSplat(MuxCommand):
@@ -142,13 +143,13 @@ class cmdCg(MuxCommand):
             # this is an add or subtract shortcut.  first we need to prep the + or -.
             args = self.lhs.replace(" + ", " +").replace(" - ", " -")
             self.lhs, self.rhs = args.split(" ", 1)
-
+        ret = target(self)
         # check for a target
-        tar = target(self).get("target")
-        key = target(self).get("key")
-        instance = target(self).get("instance")
-        value = target(self).get("value")
-        specialty = target(self).get("specialty")
+        tar = ret.get("target")
+        key = ret.get("key")
+        instance = ret.get("instance")
+        value = ret.get("value")
+        specialty = ret.get("specialty")
 
         # check if caller is target.  Only admins can set other people's stats.
         if self.caller != tar and not self.caller.locks.check_lockstring(self.caller, "perm(Admin)"):
@@ -1072,3 +1073,43 @@ class cmdSubmit(MuxCommand):
         if caller.db.stats["approved"]:
             caller.msg("|wSTATS>|n You have already been approved.")
             return
+
+        CmdJob().create_job(bucket_title="CGEN", job_title="Application",
+                            job_text="Application submitted.", job_type="Application")
+
+
+class CmdApprove(MuxCommand):
+    """
+    Approve a character application!
+
+    Usage:
+      approve <character>
+    """
+
+    key = "approve"
+    locks = "cmd:perm(Builder)"
+    help_category = "General"
+
+    def func(self):
+        """Submit the application"""
+        caller = self.caller
+        args = self.args
+
+        if not args:
+            caller.msg("|wAPPROVE>|n You must specify a character to approve.")
+            return
+
+        char = caller.search(args)
+
+        if not char:
+            caller.msg("|wAPPROVE>|n Character not found.")
+            return
+
+        if char.db.stats["approved"]:
+            caller.msg("|wAPPROVE>|n Character already approved.")
+            return
+
+        char.db.stats["approved"] = True
+        char.db.stats["approved_by"] = caller.name
+
+        caller.msg("|wAPPROVE>|n Character approved.")

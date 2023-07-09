@@ -144,6 +144,8 @@ DISCIPLINES = [
     "obfuscate",
     "potence",
     "presence",
+    "protean",
+    "blood sorcery"
 ]
 ADVANTAGES = [
     "beautiful",
@@ -930,6 +932,100 @@ DISCIPLINES_GOOD_VALUES = {
                 "check": lambda x: x.disciplines["presence"] >= 5,
                 "check_message": "Presence 5 is required."
             },
+        },
+        "protean": {
+            "values": range(1, 6),
+            "has_specialties": True,
+            "check_message": "Protean is only available to vampires.",
+            "specialties": {
+                "eyes of the beast": {
+                    "values": [1],
+                    "check": lambda x: x.disciplines["protean"] >= 1,
+                    "check_message": "Protean 1 is required."
+                },
+                "weight of the feather": {
+                    "values": [1],
+                    "check": lambda x: x.disciplines["protean"] >= 1,
+                    "check_message": "Protean 1 is required."
+                },
+                "feral weapons": {
+                    "values": [2],
+                    "check": lambda x: x.disciplines["protean"] >= 2,
+                    "check_message": "Protean 2 is required."
+                },
+                "earth meld": {
+                    "values": [3],
+                    "check": lambda x: x.disciplines["protean"] >= 3,
+                    "check_message": "Protean 3 is required."
+                },
+                "shape change": {
+                    "values": [3],
+                    "check": lambda x: x.disciplines["protean"] >= 3,
+                    "check_message": "Protean 3 is required."
+                },
+                "metamorphosis": {
+                    "values": [4],
+                    "check": lambda x: x.disciplines["protean"] >= 4,
+                    "check_message": "Protean 4 is required."
+                },
+                "mist form": {
+                    "values": [5],
+                    "check": lambda x: x.disciplines["protean"] >= 5,
+                    "check_message": "Protean 5 is required."
+                },
+                "unfettered heart": {
+                    "values": [5],
+                    "check": lambda x: x.disciplines["protean"] >= 5,
+                    "check_message": "Protean 5 is required."
+                },
+            },
+        },
+        "blood_sorcery": {
+            "values": range(1, 6),
+            "has_specialties": True,
+            "check_message": "Blood Sorcery is only available to vampires.",
+            "specialties": {
+                "corrosive vitae": {
+                    "values": [1],
+                    "check": lambda x: x.disciplines["blood_sorcery"] >= 1,
+                    "check_message": "Blood Sorcery 1 is required."
+                },
+                "a taste for blood": {
+                    "values": [1],
+                    "check": lambda x: x.disciplines["blood_sorcery"] >= 1,
+                    "check_message": "Blood Sorcery 1 is required."
+                },
+                "extinguish vitae": {
+                    "values": [2],
+                    "check": lambda x: x.disciplines["blood_sorcery"] >= 2,
+                    "check_message": "Blood Sorcery 2 is required."
+                },
+                "blood of potency": {
+                    "values": [3],
+                    "check": lambda x: x.disciplines["blood_sorcery"] >= 3,
+                    "check_message": "Blood Sorcery 3 is required."
+                },
+                "scorpion's touch": {
+                    "values": [3],
+                    "check": lambda x: x.disciplines["blood_sorcery"] >= 3,
+                    "check_message": "Blood Sorcery 3 is required."
+                },
+                "theft of vitae": {
+                    "values": [4],
+                    "check": lambda x: x.disciplines["blood_sorcery"] >= 4,
+                    "check_message": "Blood Sorcery 4 is required."
+                },
+                "baal's caress": {
+                    "values": [5],
+                    "check": lambda x: x.disciplines["blood_sorcery"] >= 5,
+                    "check_message": "Blood Sorcery 5 is required."
+                },
+                "cauldron of blood": {
+                    "values": [5],
+                    "check": lambda x: x.disciplines["blood_sorcery"] >= 5,
+                    "check_message": "Blood Sorcery 5 is required."
+                },
+            }
         },
         "default": {
             "values": [],
