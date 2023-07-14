@@ -1036,15 +1036,15 @@ class CmdEmit(MuxCommand):
             if not obj:
                 return
             if rooms_only and obj.location is not None:
-                caller.msg(f"{objname} is not a room. Ignored.")
+                caller.msg(ANSIString(f"{objname} is not a room. Ignored."))
                 continue
             if accounts_only and not obj.has_account:
                 caller.msg(f"{objname} has no active account. Ignored.")
                 continue
             if obj.access(caller, "tell"):
-                obj.msg(message)
+                obj.msg(ANSIString(message))
                 if send_to_contents and hasattr(obj, "msg_contents"):
-                    obj.msg_contents(message)
+                    obj.msg_contents(ANSIString(message))
             else:
                 caller.msg(f"You are not allowed to emit to {objname}.")
 
