@@ -337,7 +337,7 @@ class CmdJob(MuxCommand):
             return
 
         try:
-            bucket = Bucket.objects.get(name=bucket_title)
+            bucket = Bucket.objects.get(name=bucket_title.lower())
         except Bucket.DoesNotExist:
             self.caller.msg(
                 f"|wJOBS>|n No bucket named |w{bucket_title}|n exists.")

@@ -1074,8 +1074,12 @@ class cmdSubmit(MuxCommand):
             caller.msg("|wSTATS>|n You have already been approved.")
             return
 
-        CmdJob().create_job(bucket_title="CGEN", job_title="Application",
-                            job_text="Application submitted.", job_type="Application")
+        description = "%s has submitted an application." % caller.name
+
+        CmdJob.create_job(self, bucket_title="CGEN", title="Character Generation",
+                          description=description, created_by=caller)
+        self.caller.msg("|wSTATS>|n Application submitted.")
+        caller.db.submitted = True
 
 
 class CmdApprove(MuxCommand):

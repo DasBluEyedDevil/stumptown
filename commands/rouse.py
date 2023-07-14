@@ -20,9 +20,6 @@ class CmdRouse(MuxCommand):
         if self.caller.db.stats["bio"]["splat"] == "vampire":
             roll = random.randint(1, 10)
 
-            self.caller.location.msg_contents(
-                "|hGame>|n %s rouses their hunger." % self.caller.name, exclude=self.caller)
-
             try:
                 if self.caller.db.stats["pools"]["hunger"] + 1 > 5:
                     self.caller.msg("You are at hunger 5. You must slake.")
@@ -31,8 +28,13 @@ class CmdRouse(MuxCommand):
                 self.caller.db.stats["pools"]["hunger"] = 0
 
             if roll > 6:
+                self.caller.location.msg_contents(
+                    "|hGame>|n %s rouses their hunger." % self.caller.name, exclude=self.caller)
                 self.caller.msg("|hGame>|n You rouse your hunger|n")
             else:
+
+                self.caller.location.msg_contents(
+                    "|hGame>|n %s rouses their blood, and gains |r+1 hunger|n." % self.caller.name, exclude=self.caller)
                 self.caller.msg(
                     "|hGame>|n |rYou fail your rouse check, and generate +1 hunger.|n")
                 try:
